@@ -10,11 +10,10 @@ dependencies:
   logging: 1.1.1
   meta: 1.8.0
   sunny_dart:
-    path: /Users/olalekanbaruwa/StudioProjects/flutter-plugins/packages/sunny_dart
-#    git:
-#      url: https://github.com/ginger-io/flutter-plugins.git
-#      ref: master
-#      path: packages/sunny_dart
+    git:
+      url: https://github.com/ginger-io/flutter-plugins.git
+      ref: master
+      path: packages/sunny_dart
   dartxx:
     git:
       url: https://github.com/ginger-io/flutter-plugins.git
