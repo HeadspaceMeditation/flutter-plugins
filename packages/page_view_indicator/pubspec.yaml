@@ -1,0 +1,15 @@
+name: page_view_indicator_ns
+version: 1.0.0+1
+description: Builds indication marks for PageView from any Widget and/or Animation.
+homepage: https://github.com/rodrigobastosv/page_view_indicator
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
