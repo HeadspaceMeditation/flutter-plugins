@@ -84,6 +84,7 @@ class _PageViewIndicatorState extends State<PageViewIndicator>
   @override
   void initState() {
     super.initState();
+    _indicators = [];
     _prevPage = max(0, widget.currentPage);
 
     _generateIndicators();
