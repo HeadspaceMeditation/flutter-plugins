@@ -11,12 +11,12 @@ dependencies:
   meta: 1.8.0
   sunny_dart:
     git:
-      url: https://github.com/ginger-io/flutter-plugins.git
+      url: https://github.com/HeadspaceMeditation/flutter-plugins.git
       ref: master
       path: packages/sunny_dart
   dartxx:
     git:
-      url: https://github.com/ginger-io/flutter-plugins.git
+      url: https://github.com/HeadspaceMeditation/flutter-plugins.git
       ref: master
       path: packages/dartxx
   flutter: 
