@@ -17,5 +17,6 @@ A new Flutter plugin.
   s.dependency 'Flutter'
   
   s.ios.deployment_target = '8.0'
+  s.resource_bundles = {'flutter_appavailability' => ['Resources/PrivacyInfo.xcprivacy']}
 end
 
