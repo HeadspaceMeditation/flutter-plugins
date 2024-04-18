@@ -1,9 +1,9 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 
 String get getOsName {
-  if (Platform.isAndroid) {
+  if (defaultTargetPlatform == TargetPlatform.android) {
     return 'ANDROID';
-  } else if (Platform.isIOS) {
+  } else if (defaultTargetPlatform == TargetPlatform.iOS) {
     return 'IOS';
   } else {
     return 'N/A';
