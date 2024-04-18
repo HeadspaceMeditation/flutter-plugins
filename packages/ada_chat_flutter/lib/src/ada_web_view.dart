@@ -99,14 +99,14 @@ class _AdaWebViewState extends State<AdaWebView> {
     verticalScrollBarEnabled: false,
     useWideViewPort: false,
     disableDefaultErrorPage: true,
-    allowFileAccessFromFileURLs: _getAllowFileAccessFromFileURLs,
+    allowFileAccessFromFileURLs: _allowFileAccessFromFileURLs,
     allowsBackForwardNavigationGestures: false,
   );
 
   /// Unsafe feature. Needed if the embed.html file is not hosted anywhere, then
   /// the file from the assets will be used.
   /// More about it (here)[https://inappwebview.dev/docs/webview/in-app-webview#antipatterns].
-  bool get _getAllowFileAccessFromFileURLs => widget.urlRequest == null;
+  late final bool _allowFileAccessFromFileURLs = widget.urlRequest == null;
 
   @override
   Widget build(BuildContext context) => InAppWebView(
@@ -212,7 +212,7 @@ console.log("adaSettings updated");
     Future.delayed(
       widget.greetingDelay,
       () {
-        if (widget.greeting != null) {
+        if (widget.greeting != null && mounted) {
           widget.controller?.triggerAnswer(widget.greeting!);
         }
       },
