@@ -24,6 +24,7 @@ class AdaWebView extends StatefulWidget {
     this.domain,
     this.hideMask = false,
     this.greeting,
+    this.greetingDelay = const Duration(seconds: 5),
     this.privateMode = false,
     this.metaFields = const {},
     this.sensitiveMetaFields = const {},
@@ -43,8 +44,13 @@ class AdaWebView extends StatefulWidget {
 
   final String handle;
 
+  /// User name, an additional field to add to the metadata
   final String? name;
+
+  /// User e-mail, an additional field to add to the metadata
   final String? email;
+
+  /// User phone, an additional field to add to the metadata
   final String? phone;
 
   /// Url to your own page with assets/embed.html file.
@@ -58,10 +64,15 @@ class AdaWebView extends StatefulWidget {
   final String? domain;
   final bool hideMask;
   final String? greeting;
+
+  /// Show greeting message after some delay to make sure that chat is loaded
+  final Duration greetingDelay;
   final bool privateMode;
   final FlatObject metaFields;
   final FlatObject sensitiveMetaFields;
   final bool crossWindowPersistence;
+
+  /// Show chat immediately without need to call start() method of [AdaController]
   final bool autostart;
   final double? rolloutOverride;
   final bool testMode;
@@ -198,11 +209,14 @@ console.log("adaSettings updated");
       widget.controller?.start();
     }
 
-    Future.delayed(Duration(seconds: 3), () {
-      if (widget.greeting != null) {
-        widget.controller?.triggerAnswer(widget.greeting!);
-      }
-    });
+    Future.delayed(
+      widget.greetingDelay,
+      () {
+        if (widget.greeting != null) {
+          widget.controller?.triggerAnswer(widget.greeting!);
+        }
+      },
+    );
   }
 
   Future<void> _init(controller) async {
