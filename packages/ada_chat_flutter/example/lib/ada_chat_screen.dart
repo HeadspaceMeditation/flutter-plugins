@@ -35,13 +35,13 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
           children: [
             AdaWebView(
               handle: 'headspace-sandbox',
-              name: 'John Doe',
+              name: 'Example user',
               email: 'qqq@google.com',
-              phone: '+234345566789',
               greeting: widget.greeting,
               controller: _adaController,
               language: 'en',
               metaFields: const {
+                'userid': 1234567890,
                 'keyStr': 'value3',
                 'keyBool': false,
                 'keyDouble': 3.456789,
