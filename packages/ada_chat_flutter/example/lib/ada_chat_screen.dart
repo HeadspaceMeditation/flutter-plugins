@@ -37,11 +37,12 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
               handle: 'headspace-sandbox',
               name: 'Example user',
               email: 'qqq@google.com',
+              phone: '+5342342131324',
               greeting: widget.greeting,
               controller: _adaController,
               language: 'en',
               metaFields: const {
-                'userid': 1234567890,
+                'userid': '1234567890',
                 'keyStr': 'value3',
                 'keyBool': false,
                 'keyDouble': 3.456789,
