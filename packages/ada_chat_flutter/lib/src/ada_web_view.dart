@@ -182,9 +182,9 @@ window.adaSettings = {
   lazy: true,
   parentElement: "content_frame",
   onAdaEmbedLoaded: () => {
-     adaEmbed.subscribeEvent("ada:chat_frame_timeout", (data, context) => {
+    adaEmbed.subscribeEvent("ada:chat_frame_timeout", (data, context) => {
        window.flutter_inappwebview.callHandler("onLoaded", data);
-     });
+    });
   },
   conversationEndCallback: function(event) {
     window.flutter_inappwebview.callHandler("onConversationEnd", event);
@@ -201,7 +201,7 @@ window.adaSettings = {
     }
   }
 };
-console.log("adaSettings updated");
+console.log("adaSettings: " + JSON.stringify(window.adaSettings));
 ''',
     );
 
