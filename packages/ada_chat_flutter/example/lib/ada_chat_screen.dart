@@ -35,7 +35,7 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
           children: [
             AdaWebView(
               handle: 'headspace-sandbox',
-              name: 'Example user',
+              name: 'User 1',
               email: 'qqq@google.com',
               phone: '+5342342131324',
               greeting: widget.greeting,
@@ -55,8 +55,9 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
               onProgressChanged: (progress) => setState(() {
                 _progress = progress / 100;
               }),
-              onAdaReady: () {
-                debugPrint('AdaChatScreen:onAdaReady');
+              onAdaReady: (isRolledOut) {
+                debugPrint(
+                    'AdaChatScreen:onAdaReady: isRolledOut=$isRolledOut');
                 setState(() => _progress = 0);
               },
               onLoaded: (data) =>
