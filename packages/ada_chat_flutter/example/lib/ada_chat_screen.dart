@@ -49,6 +49,7 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                 'keyInt': 42,
                 'keyNull': null,
               },
+              rolloutOverride: 1,
               sensitiveMetaFields: const {
                 'keySens': 'valueSens',
               },
