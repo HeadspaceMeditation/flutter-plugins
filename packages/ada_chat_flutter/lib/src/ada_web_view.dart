@@ -81,7 +81,7 @@ class AdaWebView extends StatefulWidget {
   final void Function(int progress)? onProgressChanged;
 
   final void Function(dynamic data)? onLoaded;
-  final VoidCallback? onAdaReady;
+  final void Function(dynamic isRolledOut)? onAdaReady;
   final void Function(dynamic event)? onEvent;
   final void Function(dynamic event)? onConversationEnd;
   final void Function(bool isDrawerOpen)? onDrawerToggle;
@@ -182,15 +182,15 @@ window.adaSettings = {
   lazy: true,
   parentElement: "content_frame",
   onAdaEmbedLoaded: () => {
-     adaEmbed.subscribeEvent("ada:chat_frame_timeout", (data, context) => {
+    adaEmbed.subscribeEvent("ada:chat_frame_timeout", (data, context) => {
        window.flutter_inappwebview.callHandler("onLoaded", data);
-     });
+    });
   },
   conversationEndCallback: function(event) {
     window.flutter_inappwebview.callHandler("onConversationEnd", event);
   },
-  adaReadyCallback: function() {
-    window.flutter_inappwebview.callHandler("onAdaReady");
+  adaReadyCallback: function(isRolledOut) {
+    window.flutter_inappwebview.callHandler("onAdaReady", isRolledOut);
   },
   toggleCallback: function(isDrawerOpen) {
     window.flutter_inappwebview.callHandler("onDrawerToggle", isDrawerOpen);
@@ -201,7 +201,7 @@ window.adaSettings = {
     }
   }
 };
-console.log("adaSettings updated");
+console.log("adaSettings: " + JSON.stringify(window.adaSettings));
 ''',
     );
 
@@ -243,7 +243,7 @@ console.log("adaSettings updated");
 
     controller.addJavaScriptHandler(
       handlerName: 'onAdaReady',
-      callback: (_) => widget.onAdaReady?.call(),
+      callback: (isRolledOut) => widget.onAdaReady?.call(isRolledOut),
     );
 
     controller.addJavaScriptHandler(
