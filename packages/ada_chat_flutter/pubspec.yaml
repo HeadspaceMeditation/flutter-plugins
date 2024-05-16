@@ -7,13 +7,13 @@ environment:
   flutter: ">=3.7.12"
 
 dependencies:
+  fk_user_agent: ^2.1.0 # Used by MockWebViewDependencies() tests helper
   flutter:
     sdk: flutter
   flutter_inappwebview: ^6.0.0
   meta: ^1.8.0
 
 dev_dependencies:
-  fk_user_agent: ^2.1.0
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
