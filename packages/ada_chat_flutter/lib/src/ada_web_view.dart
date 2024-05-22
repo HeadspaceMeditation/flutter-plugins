@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:ada_chat_flutter/src/ada_controller.dart';
 import 'package:ada_chat_flutter/src/ada_controller_init.dart';
+import 'package:ada_chat_flutter/src/browser_controller.dart';
 import 'package:ada_chat_flutter/src/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -32,6 +34,7 @@ class AdaWebView extends StatefulWidget {
     this.rolloutOverride,
     this.testMode = false,
     this.onProgressChanged,
+    this.browserController,
     this.onLoaded,
     this.onAdaReady,
     this.onEvent,
@@ -78,6 +81,8 @@ class AdaWebView extends StatefulWidget {
 
   /// Loading progress [0, 100].
   final void Function(int progress)? onProgressChanged;
+
+  final BrowserController? browserController;
 
   final void Function(dynamic data)? onLoaded;
   final void Function(dynamic isRolledOut)? onAdaReady;
@@ -254,21 +259,60 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
     InAppWebViewController controller,
     NavigationAction navigationAction,
   ) async {
+    final url = navigationAction.request.url;
+    print('@@@ url=$url, host=${url?.host}');
+    if (url == null ||
+        url.toString() == 'about:blank' ||
+        url.toString().endsWith('/ada_chat_flutter/assets/embed.html') ||
+        url.host == '${widget.handle}.ada.support') {
+      return NavigationActionPolicy.ALLOW;
+    }
+
     final settings = InAppWebViewSettings(
       useWideViewPort: false,
     );
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return InAppWebView(
-          initialUrlRequest: URLRequest(url: navigationAction.request.url),
-          initialSettings: settings,
-          onLoadStop: (InAppWebViewController controller, WebUri? url) {
-            print('@@@ url=$url, controller=$controller');
-          },
-        );
-      },
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) {
+          final child = InAppWebView(
+            initialUrlRequest: URLRequest(url: navigationAction.request.url),
+            initialSettings: settings,
+            onLoadStop: (InAppWebViewController controller, WebUri? url) async {
+              widget.browserController?.controller = controller;
+              print('@@@ onLoadStop: url=$url');
+
+              final onTitleChanged = widget.browserController?.onTitleChanged;
+              if (onTitleChanged != null) {
+                final title = await controller.getTitle();
+                onTitleChanged(title ?? '');
+              }
+
+              final onGoBackChanged = widget.browserController?.onGoBackChanged;
+              if (onGoBackChanged != null) {
+                final isAvailable = await controller.canGoBack();
+                onGoBackChanged(isAvailable);
+              }
+
+              final onGoForwardChanged =
+                  widget.browserController?.onGoForwardChanged;
+              if (onGoForwardChanged != null) {
+                final isAvailable = await controller.canGoForward();
+                onGoForwardChanged(isAvailable);
+              }
+            },
+          );
+
+          final pageBuilder = widget.browserController?.pageBuilder;
+          if (pageBuilder != null) {
+            return pageBuilder(context, child, widget.browserController!);
+          }
+
+          return child;
+        },
+        useRootNavigator: false,
+      ),
     );
 
     return NavigationActionPolicy.CANCEL;
