@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:ada_chat_flutter/src/ada_controller.dart';
 import 'package:ada_chat_flutter/src/ada_controller_init.dart';
@@ -114,7 +113,6 @@ class _AdaWebViewState extends State<AdaWebView> {
         initialFile: _getInitialFile,
         initialSettings: _settings,
         shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
-        onCreateWindow: _onCreateWindow,
         onProgressChanged: (_, progress) =>
             widget.onProgressChanged?.call(progress),
         onReceivedError: (controller, request, error) =>
@@ -252,39 +250,27 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
     );
   }
 
-  Future<bool?> _onCreateWindow(
-    InAppWebViewController controller,
-    CreateWindowAction createWindowAction,
-  ) async {
-    /// This method is needed to open the link in the chat after user clicks on it.
-    /// onCreateWindow() is called only on iOS, so for Android we need to have
-    /// shouldOverrideUrlLoading() implemented.
-    final uri = createWindowAction.request.url;
-
-    if (!Platform.isIOS || uri == null) {
-      return false;
-    }
-
-    InAppBrowser.openWithSystemBrowser(url: uri);
-    return true;
-  }
-
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
     InAppWebViewController controller,
     NavigationAction navigationAction,
   ) async {
-    /// This method is needed to open the link in the chat after user clicks on it.
-    /// shouldOverrideUrlLoading() is called both on iOS and Android, but for iOS
-    /// openWithSystemBrowser() is not working here so we are just skipping
-    /// with ALLOW and let the flow to get to the onCreateWindow() where opening
-    /// the browser on iOS is working.
-    final uri = navigationAction.request.url;
+    final settings = InAppWebViewSettings(
+      useWideViewPort: false,
+    );
 
-    if (!Platform.isAndroid || uri == null) {
-      return NavigationActionPolicy.ALLOW;
-    }
+    showDialog(
+      context: context,
+      builder: (context) {
+        return InAppWebView(
+          initialUrlRequest: URLRequest(url: navigationAction.request.url),
+          initialSettings: settings,
+          onLoadStop: (InAppWebViewController controller, WebUri? url) {
+            print('@@@ url=$url, controller=$controller');
+          },
+        );
+      },
+    );
 
-    InAppBrowser.openWithSystemBrowser(url: uri);
     return NavigationActionPolicy.CANCEL;
   }
 }
