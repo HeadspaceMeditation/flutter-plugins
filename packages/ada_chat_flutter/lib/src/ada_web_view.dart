@@ -142,7 +142,7 @@ class _AdaWebViewState extends State<AdaWebView> {
         : 'packages/ada_chat_flutter/assets/embed.html';
   }
 
-  Future<void> _start(controller, url) async {
+  Future<void> _start(InAppWebViewController controller, WebUri? url) async {
     final metaFields = {
       ...widget.metaFields,
       'sdkType': getOsName,
@@ -219,7 +219,7 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
     );
   }
 
-  Future<void> _init(controller) async {
+  Future<void> _init(InAppWebViewController controller) async {
     widget.controller?.init(
       webViewController: controller,
       handle: widget.handle,
