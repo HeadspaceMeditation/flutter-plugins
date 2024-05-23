@@ -282,7 +282,8 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
     NavigationAction navigationAction,
   ) async {
     final url = navigationAction.request.url;
-    print('@@@ url=$url, host=${url?.host}');
+    debugPrint('@@@ url=$url, host=${url?.host}');
+
     if (url == null ||
         url.toString() == 'about:blank' ||
         url.toString() == widget.urlRequest?.url.toString() ||
