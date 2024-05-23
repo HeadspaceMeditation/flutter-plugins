@@ -1,5 +1,6 @@
 import 'package:ada_chat_flutter/ada_chat_flutter.dart';
 import 'package:example/commands_menu.dart';
+import 'package:example/page_controls.dart';
 import 'package:flutter/material.dart';
 
 class AdaChatScreen extends StatefulWidget {
@@ -17,9 +18,6 @@ class AdaChatScreen extends StatefulWidget {
 class _AdaChatScreenState extends State<AdaChatScreen> {
   final _adaController = AdaController();
   var _progress = 0.0;
-  String? _title;
-  bool _goBackIsAvailable = false;
-  bool _goForwardIsAvailable = false;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +62,12 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                     'AdaChatScreen:onAdaReady: isRolledOut=$isRolledOut');
                 setState(() => _progress = 0);
               },
-              browserController: _getBrowserController,
+              browserSettings: BrowserSettings(
+                pageBuilder: (context, browser, controller) => PageControls(
+                  controller: controller,
+                  child: browser,
+                ),
+              ),
               onLoaded: (data) =>
                   debugPrint('AdaChatScreen:onLoaded: data=$data'),
               onEvent: (event) =>
@@ -90,65 +93,6 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  BrowserController get _getBrowserController {
-    return BrowserController(
-      pageBuilder: (context, browser, controls) => Stack(
-        children: [
-          browser,
-          Align(
-            alignment: Alignment.topCenter,
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_ios),
-                  onPressed: _goBackIsAvailable ? controls.goBack : null,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.arrow_forward_ios),
-                  onPressed: _goForwardIsAvailable ? controls.goForward : null,
-                ),
-                Expanded(
-                  child: Text(
-                    _title ?? '',
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineMedium
-                        ?.copyWith(color: Colors.green),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: Navigator.of(context).pop,
-                ),
-              ],
-            ),
-          ),
-
-          // Placeholder(),
-        ],
-      ),
-      onGoBackChanged: (isAvailable) {
-        debugPrint('@@@ onGoBackChanged: isAvailable=$isAvailable');
-        setState(() {
-          _goBackIsAvailable = isAvailable;
-        });
-      },
-      onGoForwardChanged: (isAvailable) {
-        debugPrint('@@@ onGoForwardChanged: isAvailable=$isAvailable');
-        setState(() {
-          _goForwardIsAvailable = isAvailable;
-        });
-      },
-      onTitleChanged: (text) {
-        debugPrint('@@@ onTitleChanged: text=$text');
-        setState(() {
-          _title = text;
-        });
-      },
     );
   }
 

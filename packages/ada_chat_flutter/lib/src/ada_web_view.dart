@@ -8,6 +8,28 @@ import 'package:ada_chat_flutter/src/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
+/// User's method to wrap the browser widget in a custom user's page
+///
+/// context - Current context
+/// browser - Browser widget that is opened by the Ada chat
+/// controller - Controller for browser widget
+typedef PageBuilder = Widget Function(
+  BuildContext context,
+  Widget browser,
+  BrowserController controller,
+);
+
+class BrowserSettings {
+  BrowserSettings({
+    required this.pageBuilder,
+  });
+
+  final _control = BrowserController();
+
+  /// Custom page builder
+  final PageBuilder pageBuilder;
+}
+
 /// Ada chat WebView widget.
 ///
 /// Read fields description (here)[https://developers.ada.cx/reference/embed2-reference].
@@ -34,7 +56,7 @@ class AdaWebView extends StatefulWidget {
     this.rolloutOverride,
     this.testMode = false,
     this.onProgressChanged,
-    this.browserController,
+    this.browserSettings,
     this.onLoaded,
     this.onAdaReady,
     this.onEvent,
@@ -82,7 +104,7 @@ class AdaWebView extends StatefulWidget {
   /// Loading progress [0, 100].
   final void Function(int progress)? onProgressChanged;
 
-  final BrowserController? browserController;
+  final BrowserSettings? browserSettings;
 
   final void Function(dynamic data)? onLoaded;
   final void Function(dynamic isRolledOut)? onAdaReady;
@@ -280,33 +302,26 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
             initialUrlRequest: URLRequest(url: navigationAction.request.url),
             initialSettings: settings,
             onLoadStop: (InAppWebViewController controller, WebUri? url) async {
-              widget.browserController?.controller = controller;
+              widget.browserSettings?._control.init(controller);
+
               print('@@@ onLoadStop: url=$url');
 
-              final onTitleChanged = widget.browserController?.onTitleChanged;
-              if (onTitleChanged != null) {
-                final title = await controller.getTitle();
-                onTitleChanged(title ?? '');
-              }
+              final title = await controller.getTitle();
+              widget.browserSettings?._control.setTitle(title ?? '');
 
-              final onGoBackChanged = widget.browserController?.onGoBackChanged;
-              if (onGoBackChanged != null) {
-                final isAvailable = await controller.canGoBack();
-                onGoBackChanged(isAvailable);
-              }
+              final canGoBack = await controller.canGoBack();
+              widget.browserSettings?._control.setBackIsAvailable(canGoBack);
 
-              final onGoForwardChanged =
-                  widget.browserController?.onGoForwardChanged;
-              if (onGoForwardChanged != null) {
-                final isAvailable = await controller.canGoForward();
-                onGoForwardChanged(isAvailable);
-              }
+              final canGoForward = await controller.canGoForward();
+              widget.browserSettings?._control
+                  .setForwardIsAvailable(canGoForward);
             },
           );
 
-          final pageBuilder = widget.browserController?.pageBuilder;
+          final pageBuilder = widget.browserSettings?.pageBuilder;
           if (pageBuilder != null) {
-            return pageBuilder(context, child, widget.browserController!);
+            return pageBuilder(
+                context, child, widget.browserSettings!._control);
           }
 
           return child;

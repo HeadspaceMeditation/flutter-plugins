@@ -1,46 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
-/// User's method to wrap the browser widget in a custom user's page
-///
-/// context - Current context
-/// browser - Browser widget that is opened by the Ada chat
-/// controls - Controls for browser widget
-typedef PageBuilder = Widget Function(
-  BuildContext context,
-  Widget browser,
-  BrowserControls controls,
-);
-
 typedef BooleanCallback = void Function(bool isAvailable);
 typedef StringCallback = void Function(String text);
 
-class BrowserInit {
+class BrowserController extends ChangeNotifier {
   InAppWebViewController? _controller;
+  String _title = '';
+  bool _backIsAvailable = false;
+  bool _forwardIsAvailable = false;
 
-  set controller(InAppWebViewController controller) => _controller = controller;
-}
+  void init(InAppWebViewController controller) => _controller = controller;
 
-class BrowserControls extends BrowserInit {
   Future<void> goBack() async => _controller?.goBack();
 
   Future<void> goForward() async => _controller?.goForward();
-}
 
-class BrowserController extends BrowserControls {
-  BrowserController({
-    required this.pageBuilder,
-    this.onTitleChanged,
-    this.onGoBackChanged,
-    this.onGoForwardChanged,
-  });
+  String get title => _title;
+  void setTitle(String text) {
+    _title = text;
+    notifyListeners();
+  }
 
-  /// Custom page builder
-  final PageBuilder pageBuilder;
+  bool get backIsAvailable => _backIsAvailable;
+  void setBackIsAvailable(bool isAvailable) {
+    _backIsAvailable = isAvailable;
+    notifyListeners();
+  }
 
-  final StringCallback? onTitleChanged;
-
-  final BooleanCallback? onGoBackChanged;
-
-  final BooleanCallback? onGoForwardChanged;
+  bool get forwardIsAvailable => _forwardIsAvailable;
+  void setForwardIsAvailable(bool isAvailable) {
+    _forwardIsAvailable = isAvailable;
+    notifyListeners();
+  }
 }
