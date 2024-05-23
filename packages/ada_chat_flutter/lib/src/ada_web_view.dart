@@ -285,6 +285,7 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
     print('@@@ url=$url, host=${url?.host}');
     if (url == null ||
         url.toString() == 'about:blank' ||
+        url.toString() == widget.urlRequest?.url.toString() ||
         url.toString().endsWith('/ada_chat_flutter/assets/embed.html') ||
         url.host == '${widget.handle}.ada.support') {
       return NavigationActionPolicy.ALLOW;
@@ -303,8 +304,6 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
             initialSettings: settings,
             onLoadStop: (InAppWebViewController controller, WebUri? url) async {
               widget.browserSettings?._control.init(controller);
-
-              print('@@@ onLoadStop: url=$url');
 
               final title = await controller.getTitle();
               widget.browserSettings?._control.setTitle(title ?? '');
