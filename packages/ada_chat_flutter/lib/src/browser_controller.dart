@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
-typedef BooleanCallback = void Function(bool isAvailable);
-typedef StringCallback = void Function(String text);
-
 class BrowserController extends ChangeNotifier {
   InAppWebViewController? _controller;
   String _title = '';

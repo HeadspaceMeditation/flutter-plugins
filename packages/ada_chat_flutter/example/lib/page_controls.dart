@@ -35,44 +35,46 @@ class _PageControlsState extends State<PageControls> {
   void _rebuild() => setState(() {});
 
   @override
-  Widget build(BuildContext context) => Stack(
-        children: [
-          widget.child,
-          Align(
-            alignment: Alignment.topCenter,
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios),
-                      onPressed: widget.controller.backIsAvailable
-                          ? widget.controller.goBack
-                          : null,
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        widget.child,
+        Align(
+          alignment: Alignment.topCenter,
+          child: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios),
+                    onPressed: widget.controller.backIsAvailable
+                        ? widget.controller.goBack
+                        : null,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_forward_ios),
+                    onPressed: widget.controller.forwardIsAvailable
+                        ? widget.controller.goForward
+                        : null,
+                  ),
+                  Expanded(
+                    child: Text(
+                      widget.controller.title,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.arrow_forward_ios),
-                      onPressed: widget.controller.forwardIsAvailable
-                          ? widget.controller.goForward
-                          : null,
-                    ),
-                    Expanded(
-                      child: Text(
-                        widget.controller.title,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: Navigator.of(context).pop,
-                    ),
-                  ],
-                ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: Navigator.of(context).pop,
+                  ),
+                ],
               ),
             ),
           ),
-        ],
-      );
+        ),
+      ],
+    );
+  }
 }

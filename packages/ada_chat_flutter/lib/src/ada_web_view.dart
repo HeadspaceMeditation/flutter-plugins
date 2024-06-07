@@ -24,10 +24,12 @@ class BrowserSettings {
     required this.pageBuilder,
   });
 
-  final _control = BrowserController();
+  late BrowserController _control;
 
   /// Custom page builder
   final PageBuilder pageBuilder;
+
+  void init() => _control = BrowserController();
 }
 
 /// Ada chat WebView widget.
@@ -127,6 +129,7 @@ class _AdaWebViewState extends State<AdaWebView> {
     disableDefaultErrorPage: true,
     allowFileAccessFromFileURLs: _allowFileAccessFromFileURLs,
     allowsBackForwardNavigationGestures: false,
+    disableContextMenu: true,
   );
 
   /// Unsafe feature. Needed if the embed.html file is not hosted anywhere, then
@@ -300,28 +303,33 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
       showDialog(
         context: context,
         builder: (context) {
+          final browserSettings = widget.browserSettings;
+          browserSettings?.init();
+
           final child = InAppWebView(
             initialUrlRequest: URLRequest(url: navigationAction.request.url),
             initialSettings: settings,
             onLoadStop: (InAppWebViewController controller, WebUri? url) async {
-              widget.browserSettings?._control.init(controller);
+              if (browserSettings == null) {
+                return;
+              }
+
+              browserSettings._control.init(controller);
 
               final title = await controller.getTitle();
-              widget.browserSettings?._control.setTitle(title ?? '');
+              browserSettings._control.setTitle(title ?? '');
 
               final canGoBack = await controller.canGoBack();
-              widget.browserSettings?._control.setBackIsAvailable(canGoBack);
+              browserSettings._control.setBackIsAvailable(canGoBack);
 
               final canGoForward = await controller.canGoForward();
-              widget.browserSettings?._control
-                  .setForwardIsAvailable(canGoForward);
+              browserSettings._control.setForwardIsAvailable(canGoForward);
             },
           );
 
-          final pageBuilder = widget.browserSettings?.pageBuilder;
+          final pageBuilder = browserSettings?.pageBuilder;
           if (pageBuilder != null) {
-            return pageBuilder(
-                context, child, widget.browserSettings!._control);
+            return pageBuilder(context, child, browserSettings!._control);
           }
 
           return child;
