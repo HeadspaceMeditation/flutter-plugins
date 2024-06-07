@@ -1,6 +1,6 @@
 import 'package:ada_chat_flutter/ada_chat_flutter.dart';
 import 'package:example/commands_menu.dart';
-import 'package:example/page_controls.dart';
+import 'package:example/page_with_controls.dart';
 import 'package:flutter/material.dart';
 
 class AdaChatScreen extends StatefulWidget {
@@ -63,7 +63,7 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                 setState(() => _progress = 0);
               },
               browserSettings: BrowserSettings(
-                pageBuilder: (context, browser, controller) => PageControls(
+                pageBuilder: (context, browser, controller) => PageWithControls(
                   controller: controller,
                   child: browser,
                 ),

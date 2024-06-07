@@ -3,34 +3,11 @@ import 'dart:convert';
 
 import 'package:ada_chat_flutter/src/ada_controller.dart';
 import 'package:ada_chat_flutter/src/ada_controller_init.dart';
-import 'package:ada_chat_flutter/src/browser_controller.dart';
+import 'package:ada_chat_flutter/src/browser_settings.dart';
+import 'package:ada_chat_flutter/src/customized_web_view.dart';
 import 'package:ada_chat_flutter/src/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-
-/// User's method to wrap the browser widget in a custom user's page
-///
-/// context - Current context
-/// browser - Browser widget that is opened by the Ada chat
-/// controller - Controller for browser widget
-typedef PageBuilder = Widget Function(
-  BuildContext context,
-  Widget browser,
-  BrowserController controller,
-);
-
-class BrowserSettings {
-  BrowserSettings({
-    required this.pageBuilder,
-  });
-
-  late BrowserController _control;
-
-  /// Custom page builder
-  final PageBuilder pageBuilder;
-
-  void init() => _control = BrowserController();
-}
 
 /// Ada chat WebView widget.
 ///
@@ -285,7 +262,7 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
     NavigationAction navigationAction,
   ) async {
     final url = navigationAction.request.url;
-    debugPrint('@@@ url=$url, host=${url?.host}');
+    debugPrint('_shouldOverrideUrlLoading: $url, host=${url?.host}');
 
     if (url == null ||
         url.toString() == 'about:blank' ||
@@ -295,45 +272,13 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
       return NavigationActionPolicy.ALLOW;
     }
 
-    final settings = InAppWebViewSettings(
-      useWideViewPort: false,
-    );
-
     unawaited(
       showDialog(
         context: context,
-        builder: (context) {
-          final browserSettings = widget.browserSettings;
-          browserSettings?.init();
-
-          final child = InAppWebView(
-            initialUrlRequest: URLRequest(url: navigationAction.request.url),
-            initialSettings: settings,
-            onLoadStop: (InAppWebViewController controller, WebUri? url) async {
-              if (browserSettings == null) {
-                return;
-              }
-
-              browserSettings._control.init(controller);
-
-              final title = await controller.getTitle();
-              browserSettings._control.setTitle(title ?? '');
-
-              final canGoBack = await controller.canGoBack();
-              browserSettings._control.setBackIsAvailable(canGoBack);
-
-              final canGoForward = await controller.canGoForward();
-              browserSettings._control.setForwardIsAvailable(canGoForward);
-            },
-          );
-
-          final pageBuilder = browserSettings?.pageBuilder;
-          if (pageBuilder != null) {
-            return pageBuilder(context, child, browserSettings!._control);
-          }
-
-          return child;
-        },
+        builder: (context) => CustomizedWebView(
+          url: url,
+          browserSettings: widget.browserSettings,
+        ),
         useRootNavigator: false,
       ),
     );
