@@ -13,6 +13,8 @@ class BrowserController extends ChangeNotifier {
 
   Future<void> goForward() async => _controller?.goForward();
 
+  Future<void> reload() async => _controller?.reload();
+
   String get title => _title;
   void setTitle(String text) {
     _title = text;

@@ -58,6 +58,10 @@ class _PageControlsState extends State<PageControls> {
                         ? widget.controller.goForward
                         : null,
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: widget.controller.reload,
+                  ),
                   Expanded(
                     child: Text(
                       widget.controller.title,
