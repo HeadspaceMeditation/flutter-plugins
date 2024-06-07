@@ -64,22 +64,23 @@ class MockWebViewDependencies {
     final mockCookieManager = MockPlatformCookieManager();
     when(() => mockCookieManager.deleteAllCookies())
         .thenAnswer((_) => Future.value(true));
-    when(() => mockCookieManager.setCookie(
-          url: any(named: 'url'),
-          name: any(named: 'name'),
-          value: any(named: 'value'),
-          path: any(named: 'path'),
-          domain: any(named: 'domain'),
-          expiresDate: any(named: 'expiresDate'),
-          maxAge: any(named: 'maxAge'),
-          isSecure: any(named: 'isSecure'),
-          isHttpOnly: any(named: 'isHttpOnly'),
-          sameSite: any(named: 'sameSite'),
-          // ignore: deprecated_member_use
-          iosBelow11WebViewController:
-              any(named: 'iosBelow11WebViewController'),
-          webViewController: any(named: 'webViewController'),
-        )).thenAnswer((_) => Future.value(true));
+    when(
+      () => mockCookieManager.setCookie(
+        url: any(named: 'url'),
+        name: any(named: 'name'),
+        value: any(named: 'value'),
+        path: any(named: 'path'),
+        domain: any(named: 'domain'),
+        expiresDate: any(named: 'expiresDate'),
+        maxAge: any(named: 'maxAge'),
+        isSecure: any(named: 'isSecure'),
+        isHttpOnly: any(named: 'isHttpOnly'),
+        sameSite: any(named: 'sameSite'),
+        // ignore: deprecated_member_use
+        iosBelow11WebViewController: any(named: 'iosBelow11WebViewController'),
+        webViewController: any(named: 'webViewController'),
+      ),
+    ).thenAnswer((_) => Future.value(true));
 
     // Mock webview platform
     final mockPlatform = MockWebViewPlatform();
@@ -92,6 +93,7 @@ class MockWebViewDependencies {
     InAppWebViewPlatform.instance = mockPlatform;
 
     // Mock user agent in setUp or setUpAll
+    // ignore: deprecated_member_use
     channel.setMockMethodCallHandler((MethodCall methodCall) async {
       return {'webViewUserAgent': 'userAgent'};
     });
@@ -99,6 +101,7 @@ class MockWebViewDependencies {
   }
 
   void tearDown() {
+    // ignore: deprecated_member_use
     channel.setMockMethodCallHandler(null);
   }
 

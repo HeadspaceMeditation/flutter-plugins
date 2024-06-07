@@ -24,7 +24,9 @@ class BrowserSettings {
   /// Custom page builder
   final PageBuilder pageBuilder;
 
+  @internal
   void init() => control = BrowserController();
 
+  @internal
   void dispose() => control?.dispose();
 }
