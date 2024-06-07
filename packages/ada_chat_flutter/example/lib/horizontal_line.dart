@@ -6,13 +6,11 @@ class HorizontalLine extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(
-          top: BorderSide(),
+  Widget build(BuildContext context) => Container(
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(),
+          ),
         ),
-      ),
-    );
-  }
+      );
 }
