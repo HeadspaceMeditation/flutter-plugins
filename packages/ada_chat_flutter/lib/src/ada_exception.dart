@@ -18,5 +18,5 @@ class AdaNullResultException extends AdaException {
   const AdaNullResultException() : super('Result is null');
 
   @override
-  String toString() => 'AdaNullResultException{}';
+  String toString() => 'AdaNullResultException{error: $error}';
 }
