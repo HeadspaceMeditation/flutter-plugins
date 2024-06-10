@@ -1,6 +1,6 @@
 import 'package:ada_chat_flutter/ada_chat_flutter.dart';
-import 'package:example/commands_menu.dart';
-import 'package:example/page_with_controls.dart';
+import 'package:example/webview_controls/page_with_controls.dart';
+import 'package:example/widgets/commands_menu.dart';
 import 'package:flutter/material.dart';
 
 class AdaChatScreen extends StatefulWidget {
@@ -34,7 +34,7 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
           body: Stack(
             children: [
               AdaWebView(
-                handle: 'example-handle',
+                handle: 'headspace-sandbox',
                 name: 'User 1',
                 email: 'qqq@google.com',
                 phone: '+5342342131324',

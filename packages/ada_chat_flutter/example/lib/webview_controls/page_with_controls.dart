@@ -1,6 +1,6 @@
 import 'package:ada_chat_flutter/ada_chat_flutter.dart';
-import 'package:example/horizontal_line.dart';
-import 'package:example/page_controls.dart';
+import 'package:example/webview_controls/page_controls.dart';
+import 'package:example/widgets/horizontal_line.dart';
 import 'package:flutter/material.dart';
 
 class PageWithControls extends StatelessWidget {
