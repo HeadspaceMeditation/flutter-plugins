@@ -16,18 +16,21 @@ class BrowserController extends ChangeNotifier {
   Future<void> reload() async => _controller?.reload();
 
   String get title => _title;
+
   void setTitle(String text) {
     _title = text;
     notifyListeners();
   }
 
   bool get backIsAvailable => _backIsAvailable;
+
   void setBackIsAvailable(bool isAvailable) {
     _backIsAvailable = isAvailable;
     notifyListeners();
   }
 
   bool get forwardIsAvailable => _forwardIsAvailable;
+
   void setForwardIsAvailable(bool isAvailable) {
     _forwardIsAvailable = isAvailable;
     notifyListeners();

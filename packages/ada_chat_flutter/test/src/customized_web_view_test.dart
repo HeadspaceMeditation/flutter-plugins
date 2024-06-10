@@ -87,8 +87,10 @@ void main() {
         ),
       );
 
-      expect(find.byType(Container),
-          findsOneWidget); // Assuming pageBuilder returns a Container
+      expect(
+        find.byType(Container),
+        findsOneWidget,
+      ); // Assuming pageBuilder returns a Container
     });
   });
 }

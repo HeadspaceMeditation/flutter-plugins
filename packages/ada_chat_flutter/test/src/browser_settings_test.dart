@@ -27,7 +27,10 @@ void main() {
 
     test('pageBuilder is correctly stored', () {
       Widget pageBuilder(
-          BuildContext context, Widget browser, BrowserController controller) {
+        BuildContext context,
+        Widget browser,
+        BrowserController controller,
+      ) {
         return Container();
       }
 

@@ -21,8 +21,10 @@ void main() {
   group('AdaNullResultException', () {
     test('toString returns correct format', () {
       final exception = AdaNullResultException();
-      expect(exception.toString(),
-          'AdaNullResultException{error: Result is null}');
+      expect(
+        exception.toString(),
+        'AdaNullResultException{error: Result is null}',
+      );
     });
   });
 }
