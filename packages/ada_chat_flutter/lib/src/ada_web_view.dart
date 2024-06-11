@@ -6,6 +6,7 @@ import 'package:ada_chat_flutter/src/ada_controller_init.dart';
 import 'package:ada_chat_flutter/src/browser_settings.dart';
 import 'package:ada_chat_flutter/src/customized_web_view.dart';
 import 'package:ada_chat_flutter/src/utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
@@ -95,6 +96,40 @@ class AdaWebView extends StatefulWidget {
 
   @override
   State<AdaWebView> createState() => _AdaWebViewState();
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(StringProperty('handle', handle));
+    properties.add(StringProperty('name', name));
+    properties.add(StringProperty('email', email));
+    properties.add(StringProperty('phone', phone));
+    properties.add(DiagnosticsProperty<URLRequest?>('urlRequest', urlRequest));
+    properties.add(StringProperty('language', language));
+    properties.add(StringProperty('cluster', cluster));
+    properties.add(StringProperty('domain', domain));
+    properties.add(DiagnosticsProperty<bool>('hideMask', hideMask));
+    properties.add(StringProperty('greeting', greeting));
+    properties
+        .add(DiagnosticsProperty<Duration>('greetingDelay', greetingDelay));
+    properties.add(DiagnosticsProperty<bool>('privateMode', privateMode));
+    properties.add(DiagnosticsProperty<FlatObject>('metaFields', metaFields));
+    properties.add(
+      DiagnosticsProperty<FlatObject>(
+        'sensitiveMetaFields',
+        sensitiveMetaFields,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<bool>(
+        'crossWindowPersistence',
+        crossWindowPersistence,
+      ),
+    );
+    properties.add(DiagnosticsProperty<bool>('autostart', autostart));
+    properties.add(DoubleProperty('rolloutOverride', rolloutOverride));
+    properties.add(DiagnosticsProperty<bool>('testMode', testMode));
+  }
 }
 
 class _AdaWebViewState extends State<AdaWebView> {
