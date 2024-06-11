@@ -1,10 +1,10 @@
 name: ada_chat_flutter
 description: Flutter implementation of Ada chat
-version: 0.0.2
+version: 0.0.3
 
 environment:
-  sdk: '>=2.19.6 <3.0.0'
-  flutter: ">=3.7.12"
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.19.0"
 
 dependencies:
   fk_user_agent: ^2.1.0 # Used by MockWebViewDependencies() tests helper

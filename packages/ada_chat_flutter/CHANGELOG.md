@@ -1,3 +1,8 @@
+## 0.0.3
+
+- Add browserSettings with webview page builder.
+- Upgrade Flutter version.
+
 ## 0.0.2
 
 - Add tests helper.
