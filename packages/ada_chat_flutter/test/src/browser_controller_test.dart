@@ -42,6 +42,19 @@ void main() {
       expect(browserController.title, newTitle);
     });
 
+    test('host getter returns correct value', () {
+      const newHost = 'New Host';
+      browserController.setHost(newHost);
+      expect(browserController.host, newHost);
+    });
+
+    test('isHttps getter returns correct value', () {
+      browserController.setIsHttps(false);
+      expect(browserController.isHttps, false);
+      browserController.setIsHttps(true);
+      expect(browserController.isHttps, true);
+    });
+
     test('backIsAvailable getter returns correct value', () {
       browserController.setBackIsAvailable(true);
       expect(browserController.backIsAvailable, true);
@@ -57,10 +70,12 @@ void main() {
       browserController.addListener(() => listenerCallCount++);
 
       browserController.setTitle('New Title');
+      browserController.setHost('New Host');
+      browserController.setIsHttps(false);
       browserController.setBackIsAvailable(true);
       browserController.setForwardIsAvailable(false);
 
-      expect(listenerCallCount, 3);
+      expect(listenerCallCount, 5);
     });
   });
 }
