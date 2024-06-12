@@ -4,6 +4,8 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 class BrowserController extends ChangeNotifier {
   InAppWebViewController? _controller;
   String _title = '';
+  String _host = '';
+  bool _isHttps = true;
   bool _backIsAvailable = false;
   bool _forwardIsAvailable = false;
 
@@ -19,6 +21,20 @@ class BrowserController extends ChangeNotifier {
 
   void setTitle(String text) {
     _title = text;
+    notifyListeners();
+  }
+
+  String get host => _host;
+
+  void setHost(String host) {
+    _host = host;
+    notifyListeners();
+  }
+
+  bool get isHttps => _isHttps;
+
+  void setIsHttps(bool isHttps) {
+    _isHttps = isHttps;
     notifyListeners();
   }
 
