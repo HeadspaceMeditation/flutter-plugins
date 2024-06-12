@@ -308,9 +308,9 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
     }
 
     unawaited(
-      showDialog(
+      showAdaptiveDialog(
         context: context,
-        barrierColor: Colors.white70,
+        barrierColor: Colors.transparent,
         builder: (context) => CustomizedWebView(
           url: url,
           browserSettings: widget.browserSettings,
