@@ -1,5 +1,5 @@
-import 'package:example/ada_chat_screen.dart';
-import 'package:example/home_screen.dart';
+import 'package:example/screens/ada_chat_screen.dart';
+import 'package:example/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {

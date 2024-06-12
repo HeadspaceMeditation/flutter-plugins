@@ -1,5 +1,5 @@
 import 'package:ada_chat_flutter/ada_chat_flutter.dart';
-import 'package:example/set_meta_field_dialog.dart';
+import 'package:example/widgets/set_meta_field_dialog.dart';
 import 'package:flutter/material.dart';
 
 class CommandsMenu extends StatelessWidget {

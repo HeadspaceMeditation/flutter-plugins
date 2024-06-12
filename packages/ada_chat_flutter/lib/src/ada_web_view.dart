@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:ada_chat_flutter/src/ada_controller.dart';
 import 'package:ada_chat_flutter/src/ada_controller_init.dart';
+import 'package:ada_chat_flutter/src/browser_settings.dart';
+import 'package:ada_chat_flutter/src/customized_web_view.dart';
 import 'package:ada_chat_flutter/src/utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
@@ -33,6 +36,7 @@ class AdaWebView extends StatefulWidget {
     this.rolloutOverride,
     this.testMode = false,
     this.onProgressChanged,
+    this.browserSettings,
     this.onLoaded,
     this.onAdaReady,
     this.onEvent,
@@ -80,6 +84,8 @@ class AdaWebView extends StatefulWidget {
   /// Loading progress [0, 100].
   final void Function(int progress)? onProgressChanged;
 
+  final BrowserSettings? browserSettings;
+
   final void Function(dynamic data)? onLoaded;
   final void Function(dynamic isRolledOut)? onAdaReady;
   final void Function(dynamic event)? onEvent;
@@ -90,6 +96,40 @@ class AdaWebView extends StatefulWidget {
 
   @override
   State<AdaWebView> createState() => _AdaWebViewState();
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(StringProperty('handle', handle));
+    properties.add(StringProperty('name', name));
+    properties.add(StringProperty('email', email));
+    properties.add(StringProperty('phone', phone));
+    properties.add(DiagnosticsProperty<URLRequest?>('urlRequest', urlRequest));
+    properties.add(StringProperty('language', language));
+    properties.add(StringProperty('cluster', cluster));
+    properties.add(StringProperty('domain', domain));
+    properties.add(DiagnosticsProperty<bool>('hideMask', hideMask));
+    properties.add(StringProperty('greeting', greeting));
+    properties
+        .add(DiagnosticsProperty<Duration>('greetingDelay', greetingDelay));
+    properties.add(DiagnosticsProperty<bool>('privateMode', privateMode));
+    properties.add(DiagnosticsProperty<FlatObject>('metaFields', metaFields));
+    properties.add(
+      DiagnosticsProperty<FlatObject>(
+        'sensitiveMetaFields',
+        sensitiveMetaFields,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<bool>(
+        'crossWindowPersistence',
+        crossWindowPersistence,
+      ),
+    );
+    properties.add(DiagnosticsProperty<bool>('autostart', autostart));
+    properties.add(DoubleProperty('rolloutOverride', rolloutOverride));
+    properties.add(DiagnosticsProperty<bool>('testMode', testMode));
+  }
 }
 
 class _AdaWebViewState extends State<AdaWebView> {
@@ -101,6 +141,7 @@ class _AdaWebViewState extends State<AdaWebView> {
     disableDefaultErrorPage: true,
     allowFileAccessFromFileURLs: _allowFileAccessFromFileURLs,
     allowsBackForwardNavigationGestures: false,
+    disableContextMenu: true,
   );
 
   /// Unsafe feature. Needed if the embed.html file is not hosted anywhere, then
@@ -114,7 +155,6 @@ class _AdaWebViewState extends State<AdaWebView> {
         initialFile: _getInitialFile,
         initialSettings: _settings,
         shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
-        onCreateWindow: _onCreateWindow,
         onProgressChanged: (_, progress) =>
             widget.onProgressChanged?.call(progress),
         onReceivedError: (controller, request, error) =>
@@ -142,7 +182,7 @@ class _AdaWebViewState extends State<AdaWebView> {
         : 'packages/ada_chat_flutter/assets/embed.html';
   }
 
-  Future<void> _start(controller, url) async {
+  Future<void> _start(InAppWebViewController controller, WebUri? url) async {
     final metaFields = {
       ...widget.metaFields,
       'sdkType': getOsName,
@@ -219,7 +259,7 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
     );
   }
 
-  Future<void> _init(controller) async {
+  Future<void> _init(InAppWebViewController controller) async {
     widget.controller?.init(
       webViewController: controller,
       handle: widget.handle,
@@ -252,39 +292,32 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
     );
   }
 
-  Future<bool?> _onCreateWindow(
-    InAppWebViewController controller,
-    CreateWindowAction createWindowAction,
-  ) async {
-    /// This method is needed to open the link in the chat after user clicks on it.
-    /// onCreateWindow() is called only on iOS, so for Android we need to have
-    /// shouldOverrideUrlLoading() implemented.
-    final uri = createWindowAction.request.url;
-
-    if (!Platform.isIOS || uri == null) {
-      return false;
-    }
-
-    InAppBrowser.openWithSystemBrowser(url: uri);
-    return true;
-  }
-
   Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
     InAppWebViewController controller,
     NavigationAction navigationAction,
   ) async {
-    /// This method is needed to open the link in the chat after user clicks on it.
-    /// shouldOverrideUrlLoading() is called both on iOS and Android, but for iOS
-    /// openWithSystemBrowser() is not working here so we are just skipping
-    /// with ALLOW and let the flow to get to the onCreateWindow() where opening
-    /// the browser on iOS is working.
-    final uri = navigationAction.request.url;
+    final url = navigationAction.request.url;
+    debugPrint('_shouldOverrideUrlLoading: $url, host=${url?.host}');
 
-    if (!Platform.isAndroid || uri == null) {
+    if (url == null ||
+        url.toString() == 'about:blank' ||
+        url.toString() == widget.urlRequest?.url.toString() ||
+        url.toString().endsWith('/ada_chat_flutter/assets/embed.html') ||
+        url.host == '${widget.handle}.ada.support') {
       return NavigationActionPolicy.ALLOW;
     }
 
-    InAppBrowser.openWithSystemBrowser(url: uri);
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => CustomizedWebView(
+          url: url,
+          browserSettings: widget.browserSettings,
+        ),
+        useRootNavigator: false,
+      ),
+    );
+
     return NavigationActionPolicy.CANCEL;
   }
 }
