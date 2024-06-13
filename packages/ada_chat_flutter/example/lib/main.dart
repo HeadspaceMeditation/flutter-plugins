@@ -13,6 +13,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
+        theme: ThemeData.light(useMaterial3: false),
+        darkTheme: ThemeData.dark(useMaterial3: false),
+        themeMode: ThemeMode.system,
         onGenerateRoute: (route) {
           switch (route.name) {
             case '/ada':
