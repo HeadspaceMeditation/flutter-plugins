@@ -13,8 +13,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        theme: ThemeData.light(useMaterial3: false),
-        darkTheme: ThemeData.dark(useMaterial3: false),
+        theme: ThemeData.from(
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.orange),
+          useMaterial3: false,
+        ),
+        darkTheme: ThemeData.from(
+          colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: Colors.orange,
+            brightness: Brightness.dark,
+          ),
+          useMaterial3: false,
+        ),
         themeMode: ThemeMode.system,
         onGenerateRoute: (route) {
           switch (route.name) {
