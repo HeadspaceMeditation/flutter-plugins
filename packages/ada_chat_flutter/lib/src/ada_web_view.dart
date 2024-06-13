@@ -311,13 +311,9 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
       showAdaptiveDialog(
         context: context,
         barrierColor: Colors.transparent,
-        builder: (context) => SafeArea(
-          child: Scaffold(
-            body: CustomizedWebView(
-              url: url,
-              browserSettings: widget.browserSettings,
-            ),
-          ),
+        builder: (context) => CustomizedWebView(
+          url: url,
+          browserSettings: widget.browserSettings,
         ),
         useRootNavigator: false,
       ),
