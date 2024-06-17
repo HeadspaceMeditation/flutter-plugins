@@ -1,3 +1,7 @@
+## 0.0.4
+
+- Add host and isHttp fields to the browser controller.
+
 ## 0.0.3
 
 - Add browserSettings with webview page builder.

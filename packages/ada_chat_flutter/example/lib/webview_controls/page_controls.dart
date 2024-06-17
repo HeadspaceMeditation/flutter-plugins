@@ -56,10 +56,30 @@ class _PageControlsState extends State<PageControls> {
                 onPressed: widget.controller.reload,
               ),
               Expanded(
-                child: Text(
-                  widget.controller.title,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodySmall,
+                child: Column(
+                  children: [
+                    Text(
+                      widget.controller.title,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    Row(
+                      children: [
+                        Icon(
+                          widget.controller.isHttps
+                              ? Icons.lock
+                              : Icons.lock_open,
+                          size: 10,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          widget.controller.host,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
               IconButton(

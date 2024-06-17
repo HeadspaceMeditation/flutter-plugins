@@ -62,10 +62,13 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                   setState(() => _progress = 0);
                 },
                 browserSettings: BrowserSettings(
-                  pageBuilder: (context, browser, controller) =>
-                      PageWithControls(
-                    controller: controller,
-                    child: browser,
+                  pageBuilder: (context, browser, controller) => Scaffold(
+                    body: SafeArea(
+                      child: PageWithControls(
+                        controller: controller,
+                        child: browser,
+                      ),
+                    ),
                   ),
                 ),
                 onLoaded: (data) =>

@@ -51,6 +51,11 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
         final title = await webViewController.getTitle();
         widget.browserSettings?.control?.setTitle(title ?? '');
 
+        final webUri = await webViewController.getUrl();
+        widget.browserSettings?.control?.setHost(webUri?.host ?? '');
+        widget.browserSettings?.control
+            ?.setIsHttps(webUri?.isScheme('https') ?? false);
+
         final canGoBack = await webViewController.canGoBack();
         widget.browserSettings?.control?.setBackIsAvailable(canGoBack);
 
