@@ -9,7 +9,7 @@ class CustomizedWebView extends StatefulWidget {
     this.browserSettings,
   });
 
-  final WebUri url;
+  final Uri url;
   final BrowserSettings? browserSettings;
 
   @override

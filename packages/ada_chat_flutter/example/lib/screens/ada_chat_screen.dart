@@ -34,7 +34,7 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
           body: Stack(
             children: [
               AdaWebView(
-                handle: 'example-handle',
+                handle: 'headspace-sandbox',
                 name: 'User 1',
                 email: 'qqq@google.com',
                 phone: '+5342342131324',

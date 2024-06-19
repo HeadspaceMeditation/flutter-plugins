@@ -4,11 +4,14 @@ import 'dart:convert';
 import 'package:ada_chat_flutter/src/ada_controller.dart';
 import 'package:ada_chat_flutter/src/ada_controller_init.dart';
 import 'package:ada_chat_flutter/src/browser_settings.dart';
-import 'package:ada_chat_flutter/src/customized_web_view.dart';
 import 'package:ada_chat_flutter/src/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+// Import for Android features.
+import 'package:webview_flutter_android/webview_flutter_android.dart';
+// Import for iOS features.
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 /// Ada chat WebView widget.
 ///
@@ -59,7 +62,7 @@ class AdaWebView extends StatefulWidget {
 
   /// Url to your own page with assets/embed.html file.
   /// The domain must be added to approved domains. (Doc)[https://docs.ada.cx/docs/scripted/use-ada-with-your-website/deploy-ada-on-your-website-or-app/restrict-your-bot-to-a-list-of-approved-domains/].
-  final URLRequest? urlRequest;
+  final Uri? urlRequest; // todo Rename to embedUri
 
   /// Controller for Ada chat. The default implementation is [AdaController].
   final AdaControllerInit? controller;
@@ -86,11 +89,11 @@ class AdaWebView extends StatefulWidget {
 
   final BrowserSettings? browserSettings;
 
-  final void Function(dynamic data)? onLoaded;
-  final void Function(dynamic isRolledOut)? onAdaReady;
-  final void Function(dynamic event)? onEvent;
-  final void Function(dynamic event)? onConversationEnd;
-  final void Function(bool isDrawerOpen)? onDrawerToggle;
+  final void Function(String data)? onLoaded;
+  final void Function(String isRolledOut)? onAdaReady;
+  final void Function(String event)? onEvent;
+  final void Function(String event)? onConversationEnd;
+  final void Function(String isDrawerOpen)? onDrawerToggle;
   final void Function(String level, String message)? onConsoleMessage;
   final void Function(String request, String error)? onLoadingError;
 
@@ -104,7 +107,7 @@ class AdaWebView extends StatefulWidget {
     properties.add(StringProperty('name', name));
     properties.add(StringProperty('email', email));
     properties.add(StringProperty('phone', phone));
-    properties.add(DiagnosticsProperty<URLRequest?>('urlRequest', urlRequest));
+    properties.add(DiagnosticsProperty<Uri?>('urlRequest', urlRequest));
     properties.add(StringProperty('language', language));
     properties.add(StringProperty('cluster', cluster));
     properties.add(StringProperty('domain', domain));
@@ -133,16 +136,114 @@ class AdaWebView extends StatefulWidget {
 }
 
 class _AdaWebViewState extends State<AdaWebView> {
-  late final _settings = InAppWebViewSettings(
-    supportZoom: false,
-    horizontalScrollBarEnabled: false,
-    verticalScrollBarEnabled: false,
-    useWideViewPort: false,
-    disableDefaultErrorPage: true,
-    allowFileAccessFromFileURLs: _allowFileAccessFromFileURLs,
-    allowsBackForwardNavigationGestures: false,
-    disableContextMenu: true,
-  );
+  late final WebViewController _controller;
+
+  // late final _settings = InAppWebViewSettings(
+  //   supportZoom: false,
+  //   horizontalScrollBarEnabled: false,
+  //   verticalScrollBarEnabled: false,
+  //   useWideViewPort: false,
+  //   disableDefaultErrorPage: true,
+  //   allowFileAccessFromFileURLs: _allowFileAccessFromFileURLs,
+  //   allowsBackForwardNavigationGestures: false,
+  //   disableContextMenu: true,
+  // );
+
+  @override
+  void initState() {
+    super.initState();
+
+    late final PlatformWebViewControllerCreationParams params;
+
+    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
+      params = WebKitWebViewControllerCreationParams(
+        allowsInlineMediaPlayback: true,
+        mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
+      );
+    } else if (WebViewPlatform.instance is AndroidWebViewPlatform) {
+      params = AndroidWebViewControllerCreationParams();
+    } else {
+      params = const PlatformWebViewControllerCreationParams();
+    }
+
+    _controller = WebViewController.fromPlatformCreationParams(params);
+
+    // final platform = _controller.platform;
+    // if (platform is AndroidWebViewController) {
+    // AndroidWebViewController.enableDebugging(true);
+    // platform.setMediaPlaybackRequiresUserGesture(false);
+    // platform.setMediaPlaybackRequiresUserGesture(false);
+    // }
+
+    _controller
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(Colors.white)
+      ..setOnConsoleMessage(_onConsoleMessage)
+      ..enableZoom(false)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onHttpAuthRequest: _onHttpAuthRequest,
+          onUrlChange: _onUrlChange,
+          onProgress: _onProgress,
+          onPageStarted: _onPageStarted,
+          onPageFinished: _onPageFinished,
+          onHttpError: _onHttpError,
+          onWebResourceError: _onWebResourceError,
+          onNavigationRequest: _onNavigationRequest,
+        ),
+      );
+
+    if (widget.urlRequest == null) {
+      _controller
+          .loadFlutterAsset('packages/ada_chat_flutter/assets/embed.html');
+    } else {
+      _controller.loadRequest(widget.urlRequest!);
+    }
+  }
+
+  void _onConsoleMessage(message) {
+    print('AdaWebView:onConsoleMessage: '
+        'level=${message.level}, '
+        'message=${message.message}');
+  }
+
+  FutureOr<NavigationDecision> _onNavigationRequest(NavigationRequest request) {
+    print('AdaWebView:onNavigationRequest: '
+        'url=${request.url}');
+    // if (request.url.startsWith('https://www.youtube.com/')) {
+    //   return NavigationDecision.prevent;
+    // }
+    return NavigationDecision.navigate;
+  }
+
+  void _onWebResourceError(WebResourceError error) {
+    print('AdaWebView:onWebResourceError: '
+        'errorCode=${error.errorCode}, '
+        'description=${error.description}');
+  }
+
+  void _onHttpError(HttpResponseError error) {
+    print('AdaWebView:onHttpError: request=${error.request}, '
+        'response=${error.response}');
+  }
+
+  void _onPageFinished(String url) {
+    print('AdaWebView:onPageFinished: url=$url');
+  }
+
+  void _onPageStarted(String url) {
+    print('AdaWebView:onPageStarted: url=$url');
+  }
+
+  void _onProgress(int progress) => widget.onProgressChanged?.call(progress);
+
+  void _onUrlChange(change) {
+    print('AdaWebView:onUrlChange: url=${change.url}');
+  }
+
+  void _onHttpAuthRequest(request) {
+    print('AdaWebView:onHttpAuthRequest: host=${request.host}');
+  }
 
   /// Unsafe feature. Needed if the embed.html file is not hosted anywhere, then
   /// the file from the assets will be used.
@@ -150,31 +251,32 @@ class _AdaWebViewState extends State<AdaWebView> {
   late final bool _allowFileAccessFromFileURLs = widget.urlRequest == null;
 
   @override
-  Widget build(BuildContext context) => InAppWebView(
-        initialUrlRequest: widget.urlRequest,
-        initialFile: _getInitialFile,
-        initialSettings: _settings,
-        shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
-        onProgressChanged: (_, progress) =>
-            widget.onProgressChanged?.call(progress),
-        onReceivedError: (controller, request, error) =>
-            widget.onLoadingError?.call(
-          request.toString(),
-          error.toString(),
-        ),
-        onReceivedHttpError: (controller, request, errorResponse) =>
-            widget.onLoadingError?.call(
-          request.toString(),
-          errorResponse.toString(),
-        ),
-        onWebViewCreated: _init,
-        onLoadStop: _start,
-        onConsoleMessage: (controller, consoleMessage) =>
-            widget.onConsoleMessage?.call(
-          consoleMessage.messageLevel.toString(),
-          consoleMessage.message,
-        ),
-      );
+  Widget build(BuildContext context) => WebViewWidget(controller: _controller);
+  // InAppWebView(
+  //   initialUrlRequest: widget.urlRequest,
+  //   initialFile: _getInitialFile,
+  //   initialSettings: _settings,
+  //   shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
+  //   onProgressChanged: (_, progress) =>
+  //       widget.onProgressChanged?.call(progress),
+  //   onReceivedError: (controller, request, error) =>
+  //       widget.onLoadingError?.call(
+  //     request.toString(),
+  //     error.toString(),
+  //   ),
+  //   onReceivedHttpError: (controller, request, errorResponse) =>
+  //       widget.onLoadingError?.call(
+  //     request.toString(),
+  //     errorResponse.toString(),
+  //   ),
+  //   onWebViewCreated: _init,
+  //   onLoadStop: _start,
+  //   onConsoleMessage: (controller, consoleMessage) =>
+  //       widget.onConsoleMessage?.call(
+  //     consoleMessage.messageLevel.toString(),
+  //     consoleMessage.message,
+  //   ),
+  // );
 
   String? get _getInitialFile {
     return widget.urlRequest != null
@@ -182,7 +284,7 @@ class _AdaWebViewState extends State<AdaWebView> {
         : 'packages/ada_chat_flutter/assets/embed.html';
   }
 
-  Future<void> _start(InAppWebViewController controller, WebUri? url) async {
+  Future<void> _start() async {
     final metaFields = {
       ...widget.metaFields,
       'sdkType': getOsName,
@@ -215,8 +317,8 @@ class _AdaWebViewState extends State<AdaWebView> {
 
     final settingsJson = jsonEncode(settings);
 
-    await controller.evaluateJavascript(
-      source: '''
+    await _controller.runJavaScript(
+      '''
 window.adaSettings = {
   ...$settingsJson,
   lazy: true,
@@ -259,66 +361,66 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
     );
   }
 
-  Future<void> _init(InAppWebViewController controller) async {
+  Future<void> _init() async {
     widget.controller?.init(
-      webViewController: controller,
+      webViewController: _controller,
       handle: widget.handle,
     );
 
-    controller.addJavaScriptHandler(
-      handlerName: 'onLoaded',
-      callback: (data) => widget.onLoaded?.call(data),
-    );
-
-    controller.addJavaScriptHandler(
-      handlerName: 'onConversationEnd',
-      callback: (event) => widget.onConversationEnd?.call(event),
-    );
-
-    controller.addJavaScriptHandler(
-      handlerName: 'onDrawerToggle',
-      callback: (isDrawerOpen) =>
-          widget.onDrawerToggle?.call(isDrawerOpen as bool),
-    );
-
-    controller.addJavaScriptHandler(
-      handlerName: 'onAdaReady',
-      callback: (isRolledOut) => widget.onAdaReady?.call(isRolledOut),
-    );
-
-    controller.addJavaScriptHandler(
-      handlerName: 'onEvent',
-      callback: (event) => widget.onEvent?.call(event),
-    );
+    // _controller.addJavaScriptHandler(
+    //   handlerName: 'onLoaded',
+    //   callback: (data) => widget.onLoaded?.call(data),
+    // );
+    //
+    // controller.addJavaScriptHandler(
+    //   handlerName: 'onConversationEnd',
+    //   callback: (event) => widget.onConversationEnd?.call(event),
+    // );
+    //
+    // controller.addJavaScriptHandler(
+    //   handlerName: 'onDrawerToggle',
+    //   callback: (isDrawerOpen) =>
+    //       widget.onDrawerToggle?.call(isDrawerOpen as bool),
+    // );
+    //
+    // controller.addJavaScriptHandler(
+    //   handlerName: 'onAdaReady',
+    //   callback: (isRolledOut) => widget.onAdaReady?.call(isRolledOut),
+    // );
+    //
+    // controller.addJavaScriptHandler(
+    //   handlerName: 'onEvent',
+    //   callback: (event) => widget.onEvent?.call(event),
+    // );
   }
 
-  Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
-    InAppWebViewController controller,
-    NavigationAction navigationAction,
-  ) async {
-    final url = navigationAction.request.url;
-    debugPrint('_shouldOverrideUrlLoading: $url, host=${url?.host}');
-
-    if (url == null ||
-        url.toString() == 'about:blank' ||
-        url.toString() == widget.urlRequest?.url.toString() ||
-        url.toString().endsWith('/ada_chat_flutter/assets/embed.html') ||
-        url.host == '${widget.handle}.ada.support') {
-      return NavigationActionPolicy.ALLOW;
-    }
-
-    unawaited(
-      showAdaptiveDialog(
-        context: context,
-        barrierColor: Colors.transparent,
-        builder: (context) => CustomizedWebView(
-          url: url,
-          browserSettings: widget.browserSettings,
-        ),
-        useRootNavigator: false,
-      ),
-    );
-
-    return NavigationActionPolicy.CANCEL;
-  }
+  // Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
+  //   InAppWebViewController controller,
+  //   NavigationAction navigationAction,
+  // ) async {
+  //   final url = navigationAction.request.url;
+  //   debugPrint('_shouldOverrideUrlLoading: $url, host=${url?.host}');
+  //
+  //   if (url == null ||
+  //       url.toString() == 'about:blank' ||
+  //       url.toString() == widget.urlRequest?.url.toString() ||
+  //       url.toString().endsWith('/ada_chat_flutter/assets/embed.html') ||
+  //       url.host == '${widget.handle}.ada.support') {
+  //     return NavigationActionPolicy.ALLOW;
+  //   }
+  //
+  //   unawaited(
+  //     showAdaptiveDialog(
+  //       context: context,
+  //       barrierColor: Colors.transparent,
+  //       builder: (context) => CustomizedWebView(
+  //         url: url,
+  //         browserSettings: widget.browserSettings,
+  //       ),
+  //       useRootNavigator: false,
+  //     ),
+  //   );
+  //
+  //   return NavigationActionPolicy.CANCEL;
+  // }
 }

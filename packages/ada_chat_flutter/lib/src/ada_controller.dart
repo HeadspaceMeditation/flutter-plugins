@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:ada_chat_flutter/src/ada_controller_init.dart';
-import 'package:ada_chat_flutter/src/ada_exception.dart';
 
 typedef FlatObject = Map<String, Object?>;
 
@@ -9,8 +8,9 @@ typedef FlatObject = Map<String, Object?>;
 /// https://developers.ada.cx/reference/embed2-reference
 class AdaController extends AdaControllerInit {
   @override
-  Future<void> start() => webViewController.evaluateJavascript(
-        source: '''
+  Future<void> start() => webViewController.runJavaScript(
+        // todo Check if function(){}() wrapper is needed
+        '''
 (function() {
   adaEmbed.start({
     handle: "$handle",
@@ -20,42 +20,32 @@ class AdaController extends AdaControllerInit {
 ''',
       );
 
-  Future<void> deleteHistory() => webViewController.evaluateJavascript(
-        source: '''
+  Future<void> deleteHistory() => webViewController.runJavaScript(
+        '''
 (function() {
   adaEmbed.deleteHistory();
 })();
 ''',
       );
 
-  Future<Map<String, bool>> getInfo() async {
-    final result = await webViewController.callAsyncJavaScript(
-      functionBody: '''
+  Future<Object> getInfo() async {
+    return await webViewController.runJavaScriptReturningResult(
+      '''
 return await adaEmbed.getInfo();
 ''',
     );
-
-    if (result == null) {
-      throw const AdaNullResultException();
-    } else if (result.error != null) {
-      throw AdaExecException(result.error!);
-    }
-
-    return (result.value as Map<Object?, Object?>)
-        .map((key, value) => MapEntry(key as String, value as bool));
   }
 
-  Future<void> reset() => webViewController.evaluateJavascript(
-        source: '''
+  Future<void> reset() => webViewController.runJavaScript(
+        '''
 (function() {
   adaEmbed.reset();
 })();
 ''',
       );
 
-  Future<void> setLanguage(String language) =>
-      webViewController.evaluateJavascript(
-        source: '''
+  Future<void> setLanguage(String language) => webViewController.runJavaScript(
+        '''
 (function() {
   adaEmbed.setLanguage("$language");
 })();
@@ -65,8 +55,8 @@ return await adaEmbed.getInfo();
   Future<void> setMetaFields(FlatObject meta) async {
     final metaJson = jsonEncode(meta);
 
-    await webViewController.evaluateJavascript(
-      source: '''
+    await webViewController.runJavaScript(
+      '''
 (function() {
   adaEmbed.setMetaFields($metaJson);
 })();
@@ -77,8 +67,8 @@ return await adaEmbed.getInfo();
   Future<void> setSensitiveMetaFields(FlatObject meta) async {
     final metaJson = jsonEncode(meta);
 
-    await webViewController.evaluateJavascript(
-      source: '''
+    await webViewController.runJavaScript(
+      '''
 (function() {
   adaEmbed.setSensitiveMetaFields($metaJson);
 })();
@@ -86,8 +76,8 @@ return await adaEmbed.getInfo();
     );
   }
 
-  Future<void> stop() => webViewController.evaluateJavascript(
-        source: '''
+  Future<void> stop() => webViewController.runJavaScript(
+        '''
 (function() {
   adaEmbed.stop();
 })();
@@ -96,8 +86,8 @@ return await adaEmbed.getInfo();
 
   @override
   Future<void> triggerAnswer(String answerId) =>
-      webViewController.evaluateJavascript(
-        source: '''
+      webViewController.runJavaScript(
+        '''
 (function() {
   adaEmbed.triggerAnswer("$answerId");
 })();

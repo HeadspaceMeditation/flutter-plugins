@@ -1,18 +1,18 @@
 import 'dart:async';
 
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:meta/meta.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 abstract class AdaControllerInit {
   @visibleForTesting
   @protected
-  late InAppWebViewController webViewController;
+  late WebViewController webViewController;
   @visibleForTesting
   @protected
   late String handle;
 
   FutureOr<void> init({
-    required InAppWebViewController webViewController,
+    required WebViewController webViewController,
     required String handle,
   }) {
     this.webViewController = webViewController;

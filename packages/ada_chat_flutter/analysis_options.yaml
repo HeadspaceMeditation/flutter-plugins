@@ -5,7 +5,6 @@ linter:
     use_key_in_widget_constructors: false
     no_adjacent_strings_in_list: false
     literal_only_boolean_expressions: false
-    prefer_single_quotes: false
     slash_for_doc_comments: false
     curly_braces_in_flow_control_structures: false
     omit_local_variable_types: false
