@@ -148,6 +148,7 @@ class _AdaWebViewState extends State<AdaWebView> {
       params = WebKitWebViewControllerCreationParams(
         allowsInlineMediaPlayback: true,
         mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
+        limitsNavigationsToAppBoundDomains: false, // todo Remove?
       );
     } else if (WebViewPlatform.instance is AndroidWebViewPlatform) {
       params = AndroidWebViewControllerCreationParams();
@@ -157,12 +158,11 @@ class _AdaWebViewState extends State<AdaWebView> {
 
     _controller = WebViewController.fromPlatformCreationParams(params);
 
-    // final platform = _controller.platform;
-    // if (platform is AndroidWebViewController) {
-    //   AndroidWebViewController.enableDebugging(true);
-    //   platform.setMediaPlaybackRequiresUserGesture(false);
-    //   platform.setMediaPlaybackRequiresUserGesture(false);
-    // }
+    final platform = _controller.platform;
+    if (platform is AndroidWebViewController) {
+      AndroidWebViewController.enableDebugging(true);
+    }
+    // else if (platform is WebKitWebViewController) {}
 
     _controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -218,12 +218,15 @@ class _AdaWebViewState extends State<AdaWebView> {
 
   void _onPageFinished(String url) {
     print('AdaWebView:onPageFinished: url=$url');
-    _start();
+
+    Future.delayed(Duration.zero, () async {
+      await _init();
+      await _start();
+    });
   }
 
   void _onPageStarted(String url) {
     print('AdaWebView:onPageStarted: url=$url');
-    _init();
   }
 
   void _onProgress(int progress) => widget.onProgressChanged?.call(progress);
