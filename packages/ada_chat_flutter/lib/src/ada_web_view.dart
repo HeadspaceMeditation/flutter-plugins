@@ -138,17 +138,6 @@ class AdaWebView extends StatefulWidget {
 class _AdaWebViewState extends State<AdaWebView> {
   late final WebViewController _controller;
 
-  // late final _settings = InAppWebViewSettings(
-  //   supportZoom: false,
-  //   horizontalScrollBarEnabled: false,
-  //   verticalScrollBarEnabled: false,
-  //   useWideViewPort: false,
-  //   disableDefaultErrorPage: true,
-  //   allowFileAccessFromFileURLs: _allowFileAccessFromFileURLs,
-  //   allowsBackForwardNavigationGestures: false,
-  //   disableContextMenu: true,
-  // );
-
   @override
   void initState() {
     super.initState();
@@ -170,9 +159,9 @@ class _AdaWebViewState extends State<AdaWebView> {
 
     // final platform = _controller.platform;
     // if (platform is AndroidWebViewController) {
-    // AndroidWebViewController.enableDebugging(true);
-    // platform.setMediaPlaybackRequiresUserGesture(false);
-    // platform.setMediaPlaybackRequiresUserGesture(false);
+    //   AndroidWebViewController.enableDebugging(true);
+    //   platform.setMediaPlaybackRequiresUserGesture(false);
+    //   platform.setMediaPlaybackRequiresUserGesture(false);
     // }
 
     _controller
@@ -229,10 +218,12 @@ class _AdaWebViewState extends State<AdaWebView> {
 
   void _onPageFinished(String url) {
     print('AdaWebView:onPageFinished: url=$url');
+    _start();
   }
 
   void _onPageStarted(String url) {
     print('AdaWebView:onPageStarted: url=$url');
+    _init();
   }
 
   void _onProgress(int progress) => widget.onProgressChanged?.call(progress);
@@ -245,44 +236,8 @@ class _AdaWebViewState extends State<AdaWebView> {
     print('AdaWebView:onHttpAuthRequest: host=${request.host}');
   }
 
-  /// Unsafe feature. Needed if the embed.html file is not hosted anywhere, then
-  /// the file from the assets will be used.
-  /// More about it (here)[https://inappwebview.dev/docs/webview/in-app-webview#antipatterns].
-  late final bool _allowFileAccessFromFileURLs = widget.urlRequest == null;
-
   @override
   Widget build(BuildContext context) => WebViewWidget(controller: _controller);
-  // InAppWebView(
-  //   initialUrlRequest: widget.urlRequest,
-  //   initialFile: _getInitialFile,
-  //   initialSettings: _settings,
-  //   shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
-  //   onProgressChanged: (_, progress) =>
-  //       widget.onProgressChanged?.call(progress),
-  //   onReceivedError: (controller, request, error) =>
-  //       widget.onLoadingError?.call(
-  //     request.toString(),
-  //     error.toString(),
-  //   ),
-  //   onReceivedHttpError: (controller, request, errorResponse) =>
-  //       widget.onLoadingError?.call(
-  //     request.toString(),
-  //     errorResponse.toString(),
-  //   ),
-  //   onWebViewCreated: _init,
-  //   onLoadStop: _start,
-  //   onConsoleMessage: (controller, consoleMessage) =>
-  //       widget.onConsoleMessage?.call(
-  //     consoleMessage.messageLevel.toString(),
-  //     consoleMessage.message,
-  //   ),
-  // );
-
-  String? get _getInitialFile {
-    return widget.urlRequest != null
-        ? null
-        : 'packages/ada_chat_flutter/assets/embed.html';
-  }
 
   Future<void> _start() async {
     final metaFields = {

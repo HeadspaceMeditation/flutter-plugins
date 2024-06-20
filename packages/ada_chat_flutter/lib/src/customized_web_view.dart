@@ -1,6 +1,6 @@
 import 'package:ada_chat_flutter/src/browser_settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class CustomizedWebView extends StatefulWidget {
   const CustomizedWebView({
@@ -17,14 +17,47 @@ class CustomizedWebView extends StatefulWidget {
 }
 
 class _CustomizedWebViewState extends State<CustomizedWebView> {
-  final _settings = InAppWebViewSettings(
-    useWideViewPort: false,
-  );
+  late final WebViewController _controller = WebViewController();
 
   @override
   void initState() {
     super.initState();
     widget.browserSettings?.init();
+
+    late final PlatformWebViewControllerCreationParams params;
+
+    _controller
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onUrlChange: _onUrlChange,
+          onPageStarted: _onPageStarted,
+          onPageFinished: _onPageFinished,
+          onNavigationRequest: _onNavigationRequest,
+        ),
+      );
+  }
+
+  void _onUrlChange(change) {
+    print('AdaWebView:onUrlChange: url=${change.url}');
+  }
+
+  void _onPageFinished(String url) {
+    print('AdaWebView:onPageFinished: url=$url');
+  }
+
+  void _onPageStarted(String url) {
+    print('AdaWebView:onPageStarted: url=$url');
+  }
+
+  Future<NavigationDecision> _onNavigationRequest(
+      NavigationRequest request) async {
+    print('AdaWebView:onNavigationRequest: '
+        'url=${request.url}');
+    // if (request.url.startsWith('https://www.youtube.com/')) {
+    //   return NavigationDecision.prevent;
+    // }
+    return NavigationDecision.navigate;
   }
 
   @override
@@ -35,34 +68,7 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
 
   @override
   Widget build(BuildContext context) {
-    final child = InAppWebView(
-      initialUrlRequest: URLRequest(url: widget.url),
-      initialSettings: _settings,
-      onLoadStop: (
-        InAppWebViewController webViewController,
-        WebUri? url,
-      ) async {
-        if (widget.browserSettings == null) {
-          return;
-        }
-
-        widget.browserSettings?.control?.init(webViewController);
-
-        final title = await webViewController.getTitle();
-        widget.browserSettings?.control?.setTitle(title ?? '');
-
-        final webUri = await webViewController.getUrl();
-        widget.browserSettings?.control?.setHost(webUri?.host ?? '');
-        widget.browserSettings?.control
-            ?.setIsHttps(webUri?.isScheme('https') ?? false);
-
-        final canGoBack = await webViewController.canGoBack();
-        widget.browserSettings?.control?.setBackIsAvailable(canGoBack);
-
-        final canGoForward = await webViewController.canGoForward();
-        widget.browserSettings?.control?.setForwardIsAvailable(canGoForward);
-      },
-    );
+    final child = WebViewWidget(controller: _controller);
 
     final pageBuilder = widget.browserSettings?.pageBuilder;
     final browserController = widget.browserSettings?.control;
