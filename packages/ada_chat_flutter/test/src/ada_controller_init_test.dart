@@ -1,10 +1,6 @@
 import 'package:ada_chat_flutter/src/ada_controller_init.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-
-class MockInAppWebViewController extends Mock
-    implements InAppWebViewController {}
 
 class AdaControllerInitImpl extends AdaControllerInit {
   @override

@@ -8,9 +8,9 @@ import 'package:ada_chat_flutter/src/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-// Import for Android features.
+// ignore: depend_on_referenced_packages
 import 'package:webview_flutter_android/webview_flutter_android.dart';
-// Import for iOS features.
+// ignore: depend_on_referenced_packages
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 /// Ada chat WebView widget.
@@ -40,8 +40,8 @@ class AdaWebView extends StatefulWidget {
     this.testMode = false,
     this.onProgressChanged,
     this.browserSettings,
-    this.onLoaded,
     this.onAdaReady,
+    this.onLoaded,
     this.onEvent,
     this.onConversationEnd,
     this.onDrawerToggle,
@@ -89,13 +89,13 @@ class AdaWebView extends StatefulWidget {
 
   final BrowserSettings? browserSettings;
 
-  final void Function(String data)? onLoaded;
-  final void Function(String isRolledOut)? onAdaReady;
-  final void Function(String event)? onEvent;
-  final void Function(String event)? onConversationEnd;
-  final void Function(String isDrawerOpen)? onDrawerToggle;
+  final void Function(dynamic data)? onLoaded;
+  final void Function(dynamic isRolledOut)? onAdaReady;
+  final void Function(dynamic event)? onEvent;
+  final void Function(dynamic event)? onConversationEnd;
+  final void Function(dynamic isDrawerOpen)? onDrawerToggle;
   final void Function(String level, String message)? onConsoleMessage;
-  final void Function(String request, String error)? onLoadingError;
+  final void Function(String request, String response)? onLoadingError;
 
   @override
   State<AdaWebView> createState() => _AdaWebViewState();
@@ -190,11 +190,8 @@ class _AdaWebViewState extends State<AdaWebView> {
     }
   }
 
-  void _onConsoleMessage(message) {
-    print('AdaWebView:onConsoleMessage: '
-        'level=${message.level}, '
-        'message=${message.message}');
-  }
+  void _onConsoleMessage(JavaScriptConsoleMessage message) =>
+      widget.onConsoleMessage?.call(message.level.toString(), message.message);
 
   FutureOr<NavigationDecision> _onNavigationRequest(NavigationRequest request) {
     print('AdaWebView:onNavigationRequest: '
@@ -211,31 +208,28 @@ class _AdaWebViewState extends State<AdaWebView> {
         'description=${error.description}');
   }
 
-  void _onHttpError(HttpResponseError error) {
-    print('AdaWebView:onHttpError: request=${error.request}, '
-        'response=${error.response}');
-  }
+  void _onHttpError(HttpResponseError error) => widget.onLoadingError
+      ?.call(error.request.toString(), error.response.toString());
 
   void _onPageFinished(String url) {
     print('AdaWebView:onPageFinished: url=$url');
 
-    Future.delayed(Duration.zero, () async {
-      await _init();
-      await _start();
-    });
+    _start();
   }
 
   void _onPageStarted(String url) {
     print('AdaWebView:onPageStarted: url=$url');
+
+    _init();
   }
 
   void _onProgress(int progress) => widget.onProgressChanged?.call(progress);
 
-  void _onUrlChange(change) {
+  void _onUrlChange(UrlChange change) {
     print('AdaWebView:onUrlChange: url=${change.url}');
   }
 
-  void _onHttpAuthRequest(request) {
+  void _onHttpAuthRequest(HttpAuthRequest request) {
     print('AdaWebView:onHttpAuthRequest: host=${request.host}');
   }
 
@@ -281,23 +275,26 @@ window.adaSettings = {
   ...$settingsJson,
   lazy: true,
   parentElement: "content_frame",
+  adaReadyCallback: function(isRolledOut) {
+    onAdaReady.postMessage(JSON.stringify(isRolledOut));
+  },
   onAdaEmbedLoaded: () => {
     adaEmbed.subscribeEvent("ada:chat_frame_timeout", (data, context) => {
-       window.flutter_inappwebview.callHandler("onLoaded", data);
+      onLoaded.postMessage(data === undefined ? "" : JSON.stringify(data));
     });
   },
   conversationEndCallback: function(event) {
-    window.flutter_inappwebview.callHandler("onConversationEnd", event);
-  },
-  adaReadyCallback: function(isRolledOut) {
-    window.flutter_inappwebview.callHandler("onAdaReady", isRolledOut);
+    console.log("onConversationEnd: " + JSON.stringify(event));
+    onConversationEnd.postMessage(JSON.stringify(event));
   },
   toggleCallback: function(isDrawerOpen) {
-    window.flutter_inappwebview.callHandler("onDrawerToggle", isDrawerOpen);
+    console.log("onDrawerToggle: " + JSON.stringify(isDrawerOpen));
+    onDrawerToggle.postMessage(JSON.stringify(isDrawerOpen));
   },
   eventCallbacks: {
     "*": function(event) {
-     window.flutter_inappwebview.callHandler("onEvent", JSON.stringify(event));
+      console.log("onEvent: " + JSON.stringify(event));
+      onEvent.postMessage(JSON.stringify(event));
     }
   }
 };
@@ -325,31 +322,53 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
       handle: widget.handle,
     );
 
-    // _controller.addJavaScriptHandler(
-    //   handlerName: 'onLoaded',
-    //   callback: (data) => widget.onLoaded?.call(data),
-    // );
-    //
-    // controller.addJavaScriptHandler(
-    //   handlerName: 'onConversationEnd',
-    //   callback: (event) => widget.onConversationEnd?.call(event),
-    // );
-    //
-    // controller.addJavaScriptHandler(
-    //   handlerName: 'onDrawerToggle',
-    //   callback: (isDrawerOpen) =>
-    //       widget.onDrawerToggle?.call(isDrawerOpen as bool),
-    // );
-    //
-    // controller.addJavaScriptHandler(
-    //   handlerName: 'onAdaReady',
-    //   callback: (isRolledOut) => widget.onAdaReady?.call(isRolledOut),
-    // );
-    //
-    // controller.addJavaScriptHandler(
-    //   handlerName: 'onEvent',
-    //   callback: (event) => widget.onEvent?.call(event),
-    // );
+    await _controller.addJavaScriptChannel(
+      'onLoaded',
+      onMessageReceived: (JavaScriptMessage message) {
+        final json = jsonStrToMap(message.message);
+        widget.onLoaded?.call(json);
+      },
+    );
+
+    await _controller.addJavaScriptChannel(
+      'onConversationEnd',
+      onMessageReceived: (JavaScriptMessage message) {
+        final json = jsonStrToMap(message.message);
+        widget.onConversationEnd?.call(json);
+      },
+    );
+
+    await _controller.addJavaScriptChannel(
+      'onDrawerToggle',
+      onMessageReceived: (JavaScriptMessage message) {
+        final json = jsonStrToMap(message.message);
+        widget.onDrawerToggle?.call(json);
+      },
+    );
+
+    await _controller.addJavaScriptChannel(
+      'onAdaReady',
+      onMessageReceived: (JavaScriptMessage message) {
+        final json = jsonStrToMap(message.message);
+        widget.onAdaReady?.call(json);
+      },
+    );
+
+    await _controller.addJavaScriptChannel(
+      'onEvent',
+      onMessageReceived: (JavaScriptMessage message) {
+        final json = jsonStrToMap(message.message);
+        widget.onEvent?.call(json);
+      },
+    );
+  }
+
+  dynamic jsonStrToMap(String message) {
+    if (message.isEmpty) {
+      return <String, dynamic>{};
+    }
+
+    return jsonDecode(message);
   }
 
   // Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(

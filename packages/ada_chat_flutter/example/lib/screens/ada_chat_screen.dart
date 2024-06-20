@@ -56,11 +56,6 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                 onProgressChanged: (progress) => setState(() {
                   _progress = progress / 100;
                 }),
-                onAdaReady: (isRolledOut) {
-                  debugPrint(
-                      'AdaChatScreen:onAdaReady: isRolledOut=$isRolledOut');
-                  setState(() => _progress = 0);
-                },
                 browserSettings: BrowserSettings(
                   pageBuilder: (context, browser, controller) => Scaffold(
                     body: SafeArea(
@@ -73,6 +68,11 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                 ),
                 onLoaded: (data) =>
                     debugPrint('AdaChatScreen:onLoaded: data=$data'),
+                onAdaReady: (isRolledOut) {
+                  debugPrint(
+                      'AdaChatScreen:onAdaReady: isRolledOut=$isRolledOut');
+                  setState(() => _progress = 0);
+                },
                 onEvent: (event) =>
                     debugPrint('AdaChatScreen:onEvent: event=$event'),
                 onConsoleMessage: (level, message) =>
@@ -82,9 +82,9 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                     debugPrint('AdaChatScreen:onConversationEnd: event=$event'),
                 onDrawerToggle: (isDrawerOpen) => debugPrint(
                     'AdaChatScreen:onConversationEnd: isDrawerOpen=$isDrawerOpen'),
-                onLoadingError: (request, error) =>
+                onLoadingError: (request, response) =>
                     debugPrint('AdaChatScreen:onLoadingError: '
-                        'request=$request, error=$error'),
+                        'request=$request, response=$response'),
               ),
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 500),
