@@ -19,7 +19,7 @@ import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 class AdaWebView extends StatefulWidget {
   const AdaWebView({
     super.key,
-    required this.urlRequest,
+    required this.embedUri,
     required this.handle,
     this.name,
     this.email,
@@ -62,7 +62,7 @@ class AdaWebView extends StatefulWidget {
 
   /// Url to your own page with embed.html file.
   /// The domain must be added to approved domains. (Doc)[https://docs.ada.cx/docs/scripted/use-ada-with-your-website/deploy-ada-on-your-website-or-app/restrict-your-bot-to-a-list-of-approved-domains/].
-  final Uri urlRequest; // todo Rename to embedUri
+  final Uri embedUri;
 
   /// Controller for Ada chat. The default implementation is [AdaController].
   final AdaControllerInit? controller;
@@ -107,7 +107,7 @@ class AdaWebView extends StatefulWidget {
     properties.add(StringProperty('name', name));
     properties.add(StringProperty('email', email));
     properties.add(StringProperty('phone', phone));
-    properties.add(DiagnosticsProperty<Uri?>('urlRequest', urlRequest));
+    properties.add(DiagnosticsProperty<Uri?>('urlRequest', embedUri));
     properties.add(StringProperty('language', language));
     properties.add(StringProperty('cluster', cluster));
     properties.add(StringProperty('domain', domain));
@@ -182,7 +182,7 @@ class _AdaWebViewState extends State<AdaWebView> {
         ),
       );
 
-    _controller.loadRequest(widget.urlRequest);
+    _controller.loadRequest(widget.embedUri);
   }
 
   void _onConsoleMessage(JavaScriptConsoleMessage message) =>
@@ -190,10 +190,40 @@ class _AdaWebViewState extends State<AdaWebView> {
 
   FutureOr<NavigationDecision> _onNavigationRequest(NavigationRequest request) {
     print('AdaWebView:onNavigationRequest: '
-        'url=${request.url}');
-    // if (request.url.startsWith('https://www.youtube.com/')) {
-    //   return NavigationDecision.prevent;
-    // }
+        'url=${request.url}, isMainFrame=${request.isMainFrame}');
+
+    if (request.url == widget.embedUri.toString()) {
+      final requestUri = Uri.parse(request.url);
+
+      final uri = Uri(
+        scheme: requestUri.scheme,
+        userInfo: requestUri.userInfo,
+        host: requestUri.host,
+        port: requestUri.port,
+        path: requestUri.path,
+        queryParameters: {
+          ...requestUri.queryParameters,
+          ...{'dummy': 'dummy'},
+        },
+        fragment: requestUri.fragment,
+      );
+
+      final headers = {
+        "user-agent":
+            "Mozilla/5.0 (Linux; Android 13; sdk_gphone64_arm64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Mobile Safari/537.36",
+        "connection": "keep-alive",
+        "accept":
+            "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+        // "accept-language": "en-US,en;q=0.9",
+        "accept-encoding": "gzip, deflate",
+        // "host": "192.168.50.114:8000",
+        // "referer": "http://192.168.50.114:8000/"
+      };
+
+      _controller.loadRequest(uri, headers: headers);
+      return NavigationDecision.prevent;
+    }
+
     return NavigationDecision.navigate;
   }
 
