@@ -19,11 +19,11 @@ import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 class AdaWebView extends StatefulWidget {
   const AdaWebView({
     super.key,
+    required this.urlRequest,
     required this.handle,
     this.name,
     this.email,
     this.phone,
-    this.urlRequest,
     this.controller,
     this.language = 'en',
     this.cluster,
@@ -60,9 +60,9 @@ class AdaWebView extends StatefulWidget {
   /// User phone, an additional field to add to the metadata
   final String? phone;
 
-  /// Url to your own page with assets/embed.html file.
+  /// Url to your own page with embed.html file.
   /// The domain must be added to approved domains. (Doc)[https://docs.ada.cx/docs/scripted/use-ada-with-your-website/deploy-ada-on-your-website-or-app/restrict-your-bot-to-a-list-of-approved-domains/].
-  final Uri? urlRequest; // todo Rename to embedUri
+  final Uri urlRequest; // todo Rename to embedUri
 
   /// Controller for Ada chat. The default implementation is [AdaController].
   final AdaControllerInit? controller;
@@ -182,12 +182,7 @@ class _AdaWebViewState extends State<AdaWebView> {
         ),
       );
 
-    if (widget.urlRequest == null) {
-      _controller
-          .loadFlutterAsset('packages/ada_chat_flutter/assets/embed.html');
-    } else {
-      _controller.loadRequest(widget.urlRequest!);
-    }
+    _controller.loadRequest(widget.urlRequest);
   }
 
   void _onConsoleMessage(JavaScriptConsoleMessage message) =>
@@ -208,19 +203,24 @@ class _AdaWebViewState extends State<AdaWebView> {
         'description=${error.description}');
   }
 
-  void _onHttpError(HttpResponseError error) => widget.onLoadingError
-      ?.call(error.request.toString(), error.response.toString());
+  void _onHttpError(HttpResponseError error) => widget.onLoadingError?.call(
+        error.request?.uri.toString() ?? '',
+        'uri=${error.response?.uri}, '
+        'statusCode=${error.response?.statusCode}, '
+        'headers=${error.response?.headers}, ',
+      );
 
   void _onPageFinished(String url) {
     print('AdaWebView:onPageFinished: url=$url');
 
-    _start();
+    Future.delayed(Duration.zero, () async {
+      await _init();
+      await _start();
+    });
   }
 
   void _onPageStarted(String url) {
     print('AdaWebView:onPageStarted: url=$url');
-
-    _init();
   }
 
   void _onProgress(int progress) => widget.onProgressChanged?.call(progress);
@@ -303,7 +303,7 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
     );
 
     if (widget.autostart) {
-      widget.controller?.start();
+      await widget.controller?.start();
     }
 
     Future.delayed(
