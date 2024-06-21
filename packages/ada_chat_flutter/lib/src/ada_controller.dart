@@ -8,56 +8,42 @@ typedef FlatObject = Map<String, Object?>;
 /// https://developers.ada.cx/reference/embed2-reference
 class AdaController extends AdaControllerInit {
   @override
-  Future<void> start() => webViewController.runJavaScript(
-        '''
+  Future<void> start() => webViewController.runJavaScript('''
 adaEmbed.start({
   handle: "$handle",
   parentElement: "content_frame"
 });
-''',
-      );
+''');
 
-  Future<void> deleteHistory() => webViewController.runJavaScript(
-        'adaEmbed.deleteHistory();',
-      );
+  Future<void> deleteHistory() =>
+      webViewController.runJavaScript('adaEmbed.deleteHistory();');
 
   Future<Object> getInfo() async {
-    return await webViewController.runJavaScriptReturningResult(
-      'return await adaEmbed.getInfo();',
-    );
+    return await webViewController
+        .runJavaScriptReturningResult('return await adaEmbed.getInfo();');
   }
 
-  Future<void> reset() => webViewController.runJavaScript(
-        'adaEmbed.reset();',
-      );
+  Future<void> reset() => webViewController.runJavaScript('adaEmbed.reset();');
 
-  Future<void> setLanguage(String language) => webViewController.runJavaScript(
-        'adaEmbed.setLanguage("$language");',
-      );
+  Future<void> setLanguage(String language) =>
+      webViewController.runJavaScript('adaEmbed.setLanguage("$language");');
 
   Future<void> setMetaFields(FlatObject meta) async {
     final metaJson = jsonEncode(meta);
 
-    await webViewController.runJavaScript(
-      'adaEmbed.setMetaFields($metaJson);',
-    );
+    await webViewController.runJavaScript('adaEmbed.setMetaFields($metaJson);');
   }
 
   Future<void> setSensitiveMetaFields(FlatObject meta) async {
     final metaJson = jsonEncode(meta);
 
-    await webViewController.runJavaScript(
-      'adaEmbed.setSensitiveMetaFields($metaJson);',
-    );
+    await webViewController
+        .runJavaScript('adaEmbed.setSensitiveMetaFields($metaJson);');
   }
 
-  Future<void> stop() => webViewController.runJavaScript(
-        'adaEmbed.stop();',
-      );
+  Future<void> stop() => webViewController.runJavaScript('adaEmbed.stop();');
 
   @override
   Future<void> triggerAnswer(String answerId) =>
-      webViewController.runJavaScript(
-        'adaEmbed.triggerAnswer("$answerId");',
-      );
+      webViewController.runJavaScript('adaEmbed.triggerAnswer("$answerId");');
 }

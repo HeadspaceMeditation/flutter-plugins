@@ -280,7 +280,7 @@ window.adaSettings = {
   },
   onAdaEmbedLoaded: () => {
     adaEmbed.subscribeEvent("ada:chat_frame_timeout", (data, context) => {
-      onLoaded.postMessage(data === undefined ? "" : JSON.stringify(data));
+      onLoaded.postMessage(typeof data === "undefined" ? "" : JSON.stringify(data));
     });
   },
   conversationEndCallback: function(event) {
