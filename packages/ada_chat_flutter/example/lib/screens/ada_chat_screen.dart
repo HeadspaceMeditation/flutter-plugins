@@ -34,6 +34,9 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
           body: Stack(
             children: [
               AdaWebView(
+                urlRequest: Uri.parse(
+                  'https://your.domain.com/embed.html',
+                ),
                 handle: 'example-handle',
                 name: 'User 1',
                 email: 'qqq@google.com',
