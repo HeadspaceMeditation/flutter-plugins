@@ -18,11 +18,10 @@ adaEmbed.start({
   Future<void> deleteHistory() =>
       webViewController.runJavaScript('adaEmbed.deleteHistory();');
 
+  // todo Fix getInfo()
   Future<Object> getInfo() async {
     return await webViewController.runJavaScriptReturningResult('''
-let info = adaEmbed.getInfo();
-await info;
-return info;
+return await adaEmbed.getInfo();
 ''');
   }
 
