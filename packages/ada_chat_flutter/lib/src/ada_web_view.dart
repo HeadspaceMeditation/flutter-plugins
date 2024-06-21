@@ -210,15 +210,22 @@ class _AdaWebViewState extends State<AdaWebView> {
 
       final headers = {
         "user-agent":
-            "Mozilla/5.0 (Linux; Android 13; sdk_gphone64_arm64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Mobile Safari/537.36",
+            "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
         "connection": "keep-alive",
-        "accept":
-            "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
-        // "accept-language": "en-US,en;q=0.9",
+        "accept": "*/*",
         "accept-encoding": "gzip, deflate",
-        // "host": "192.168.50.114:8000",
-        // "referer": "http://192.168.50.114:8000/"
       };
+      // {
+      //   "user-agent":
+      //       "Mozilla/5.0 (Linux; Android 13; sdk_gphone64_arm64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Mobile Safari/537.36",
+      //   "connection": "keep-alive",
+      //   "accept":
+      //       "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+      //   // "accept-language": "en-US,en;q=0.9",
+      //   "accept-encoding": "gzip, deflate",
+      //   // "host": "192.168.50.114:8000",
+      //   // "referer": "http://192.168.50.114:8000/"
+      // };
 
       _controller.loadRequest(uri, headers: headers);
       return NavigationDecision.prevent;
