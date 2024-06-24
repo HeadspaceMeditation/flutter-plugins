@@ -211,7 +211,7 @@ class CommandsMenu extends StatelessWidget {
     );
 
     if (result is Map<String, String>) {
-      adaController.setSensitiveMetaFields(result);
+      await adaController.setSensitiveMetaFields(result);
     }
   }
 
@@ -224,7 +224,7 @@ class CommandsMenu extends StatelessWidget {
     );
 
     if (result is Map<String, String>) {
-      adaController.setMetaFields(result);
+      await adaController.setMetaFields(result);
     }
   }
 

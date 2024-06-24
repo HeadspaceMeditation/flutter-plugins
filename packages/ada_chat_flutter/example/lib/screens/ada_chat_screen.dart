@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:ada_chat_flutter/ada_chat_flutter.dart';
 import 'package:example/webview_controls/page_with_controls.dart';
 import 'package:example/widgets/commands_menu.dart';
@@ -69,24 +71,22 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                     ),
                   ),
                 ),
-                onLoaded: (data) =>
-                    debugPrint('AdaChatScreen:onLoaded: data=$data'),
+                onLoaded: (data) => log('AdaChatScreen:onLoaded: data=$data'),
                 onAdaReady: (isRolledOut) {
-                  debugPrint(
-                      'AdaChatScreen:onAdaReady: isRolledOut=$isRolledOut');
+                  log('AdaChatScreen:onAdaReady: isRolledOut=$isRolledOut');
                   setState(() => _progress = 0);
                 },
-                onEvent: (event) =>
-                    debugPrint('AdaChatScreen:onEvent: event=$event'),
+                onEvent: (event) => log('AdaChatScreen:onEvent: event=$event'),
                 onConsoleMessage: (level, message) =>
-                    debugPrint('AdaChatScreen:onConsoleMessage: '
+                    log('AdaChatScreen:onConsoleMessage: '
                         'level=$level, message=$message'),
                 onConversationEnd: (event) =>
-                    debugPrint('AdaChatScreen:onConversationEnd: event=$event'),
-                onDrawerToggle: (isDrawerOpen) => debugPrint(
-                    'AdaChatScreen:onConversationEnd: isDrawerOpen=$isDrawerOpen'),
+                    log('AdaChatScreen:onConversationEnd: event=$event'),
+                onDrawerToggle: (isDrawerOpen) =>
+                    log('AdaChatScreen:onConversationEnd: '
+                        'isDrawerOpen=$isDrawerOpen'),
                 onLoadingError: (request, response) =>
-                    debugPrint('AdaChatScreen:onLoadingError: '
+                    log('AdaChatScreen:onLoadingError: '
                         'request=$request, response=$response'),
               ),
               AnimatedPositioned(

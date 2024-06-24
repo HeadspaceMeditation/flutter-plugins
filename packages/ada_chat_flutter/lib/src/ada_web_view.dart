@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:ada_chat_flutter/src/ada_controller.dart';
 import 'package:ada_chat_flutter/src/ada_controller_init.dart';
@@ -190,7 +191,7 @@ class _AdaWebViewState extends State<AdaWebView> {
 
   FutureOr<NavigationDecision> _onNavigationRequest(NavigationRequest request) {
     final uri = Uri.parse(request.url);
-    print('AdaWebView:onNavigationRequest: '
+    log('AdaWebView:onNavigationRequest: '
         'url=${uri.toString()}, isMainFrame=${request.isMainFrame}');
 
     if (request.isMainFrame ||
@@ -217,7 +218,7 @@ class _AdaWebViewState extends State<AdaWebView> {
   }
 
   void _onWebResourceError(WebResourceError error) {
-    print('AdaWebView:onWebResourceError: '
+    log('AdaWebView:onWebResourceError: '
         'errorCode=${error.errorCode}, '
         'description=${error.description}');
   }
@@ -230,7 +231,7 @@ class _AdaWebViewState extends State<AdaWebView> {
       );
 
   void _onPageFinished(String url) {
-    print('AdaWebView:onPageFinished: url=$url');
+    log('AdaWebView:onPageFinished: url=$url');
 
     Future.delayed(Duration.zero, () async {
       await _init();
@@ -239,17 +240,17 @@ class _AdaWebViewState extends State<AdaWebView> {
   }
 
   void _onPageStarted(String url) {
-    print('AdaWebView:onPageStarted: url=$url');
+    log('AdaWebView:onPageStarted: url=$url');
   }
 
   void _onProgress(int progress) => widget.onProgressChanged?.call(progress);
 
   void _onUrlChange(UrlChange change) {
-    print('AdaWebView:onUrlChange: url=${change.url}');
+    log('AdaWebView:onUrlChange: url=${change.url}');
   }
 
   void _onHttpAuthRequest(HttpAuthRequest request) {
-    print('AdaWebView:onHttpAuthRequest: host=${request.host}');
+    log('AdaWebView:onHttpAuthRequest: host=${request.host}');
   }
 
   @override
