@@ -35,10 +35,16 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
           onPageFinished: _onPageFinished,
           onNavigationRequest: _onNavigationRequest,
         ),
-      );
+      )
+      ..setOnConsoleMessage(_onConsoleMessage);
 
     _webViewController.loadRequest(widget.url);
   }
+
+  void _onConsoleMessage(JavaScriptConsoleMessage message) =>
+      log('CustomizedWebView:onConsoleMessage: '
+          'level=${message.level.toString()}, '
+          'message=${message.message}');
 
   void _onUrlChange(change) {
     log('CustomizedWebView:onUrlChange: url=${change.url}');
@@ -69,16 +75,35 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
 
     final canGoForward = await _webViewController.canGoForward();
     pageController.setForwardIsAvailable(canGoForward);
+
+    await _hideAdaButton();
   }
 
-  void _onPageStarted(String url) {
+  /// Explanation: https://developers.ada.cx/reference/customize-chat#hide-the-default-chat-button
+  Future<void> _hideAdaButton() {
+    return _webViewController.runJavaScript('''
+var parent = document.getElementsByTagName('body').item(0);
+var style = document.createElement('style');
+style.type = 'text/css';
+style.innerHTML = "#ada-button-frame{ display: none; }";
+parent.appendChild(style);
+''');
+  }
+
+  Future<void> _onPageStarted(String url) async {
     log('CustomizedWebView:onPageStarted: url=$url');
   }
 
   Future<NavigationDecision> _onNavigationRequest(
     NavigationRequest request,
   ) async {
-    log('CustomizedWebView:onNavigationRequest: url=${request.url}');
+    final uri = Uri.parse(request.url);
+    log('CustomizedWebView:onNavigationRequest: url=$uri');
+
+    if (uri.toString().startsWith('https://headspace.ada.support/embed/')) {
+      return NavigationDecision.prevent;
+    }
+
     return NavigationDecision.navigate;
   }
 
