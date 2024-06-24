@@ -194,8 +194,7 @@ class _AdaWebViewState extends State<AdaWebView> {
     log('AdaWebView:onNavigationRequest: '
         'url=${uri.toString()}, isMainFrame=${request.isMainFrame}');
 
-    if (request.isMainFrame ||
-        uri.host.endsWith('${widget.handle}.ada.support') ||
+    if (uri.host == '${widget.handle}.ada.support' ||
         uri.toString() == 'about:blank') {
       // final requestUri = Uri.parse(request.url);
 
