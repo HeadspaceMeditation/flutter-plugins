@@ -42,8 +42,31 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
     print('CustomizedWebView:onUrlChange: url=${change.url}');
   }
 
-  void _onPageFinished(String url) {
+  void _onPageFinished(String url) async {
     print('CustomizedWebView:onPageFinished: url=$url');
+
+    if (widget.browserSettings == null) {
+      return;
+    }
+
+    widget.browserSettings?.control?.init(_controller);
+
+    final title = await _controller.getTitle();
+    widget.browserSettings?.control?.setTitle(title ?? '');
+
+    final currentUrl = await _controller.currentUrl();
+    if (currentUrl != null) {
+      final currentUri = Uri.parse(currentUrl);
+      widget.browserSettings?.control?.setHost(currentUri.host ?? '');
+      widget.browserSettings?.control
+          ?.setIsHttps(currentUri.isScheme('https') ?? false);
+    }
+
+    final canGoBack = await _controller.canGoBack();
+    widget.browserSettings?.control?.setBackIsAvailable(canGoBack);
+
+    final canGoForward = await _controller.canGoForward();
+    widget.browserSettings?.control?.setForwardIsAvailable(canGoForward);
   }
 
   void _onPageStarted(String url) {
