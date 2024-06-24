@@ -24,8 +24,6 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
     super.initState();
     widget.browserSettings?.init();
 
-    late final PlatformWebViewControllerCreationParams params;
-
     _controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
@@ -36,23 +34,25 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
           onNavigationRequest: _onNavigationRequest,
         ),
       );
+
+    _controller.loadRequest(widget.url);
   }
 
   void _onUrlChange(change) {
-    print('AdaWebView:onUrlChange: url=${change.url}');
+    print('CustomizedWebView:onUrlChange: url=${change.url}');
   }
 
   void _onPageFinished(String url) {
-    print('AdaWebView:onPageFinished: url=$url');
+    print('CustomizedWebView:onPageFinished: url=$url');
   }
 
   void _onPageStarted(String url) {
-    print('AdaWebView:onPageStarted: url=$url');
+    print('CustomizedWebView:onPageStarted: url=$url');
   }
 
   Future<NavigationDecision> _onNavigationRequest(
       NavigationRequest request) async {
-    print('AdaWebView:onNavigationRequest: '
+    print('CustomizedWebView:onNavigationRequest: '
         'url=${request.url}');
     // if (request.url.startsWith('https://www.youtube.com/')) {
     //   return NavigationDecision.prevent;

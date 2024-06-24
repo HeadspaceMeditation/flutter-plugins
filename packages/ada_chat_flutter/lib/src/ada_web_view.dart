@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:ada_chat_flutter/src/ada_controller.dart';
 import 'package:ada_chat_flutter/src/ada_controller_init.dart';
 import 'package:ada_chat_flutter/src/browser_settings.dart';
+import 'package:ada_chat_flutter/src/customized_web_view.dart';
 import 'package:ada_chat_flutter/src/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -148,7 +149,6 @@ class _AdaWebViewState extends State<AdaWebView> {
       params = WebKitWebViewControllerCreationParams(
         allowsInlineMediaPlayback: true,
         mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
-        limitsNavigationsToAppBoundDomains: false, // todo Remove?
       );
     } else if (WebViewPlatform.instance is AndroidWebViewPlatform) {
       params = AndroidWebViewControllerCreationParams();
@@ -189,49 +189,31 @@ class _AdaWebViewState extends State<AdaWebView> {
       widget.onConsoleMessage?.call(message.level.toString(), message.message);
 
   FutureOr<NavigationDecision> _onNavigationRequest(NavigationRequest request) {
+    final uri = Uri.parse(request.url);
     print('AdaWebView:onNavigationRequest: '
-        'url=${request.url}, isMainFrame=${request.isMainFrame}');
+        'url=${uri.toString()}, isMainFrame=${request.isMainFrame}');
 
-    if (request.url == widget.embedUri.toString()) {
-      final requestUri = Uri.parse(request.url);
+    if (request.isMainFrame ||
+        uri.host.endsWith('${widget.handle}.ada.support') ||
+        uri.toString() == 'about:blank') {
+      // final requestUri = Uri.parse(request.url);
 
-      final uri = Uri(
-        scheme: requestUri.scheme,
-        userInfo: requestUri.userInfo,
-        host: requestUri.host,
-        port: requestUri.port,
-        path: requestUri.path,
-        queryParameters: {
-          ...requestUri.queryParameters,
-          ...{'dummy': 'dummy'},
-        },
-        fragment: requestUri.fragment,
-      );
-
-      final headers = {
-        "user-agent":
-            "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
-        "connection": "keep-alive",
-        "accept": "*/*",
-        "accept-encoding": "gzip, deflate",
-      };
-      // {
-      //   "user-agent":
-      //       "Mozilla/5.0 (Linux; Android 13; sdk_gphone64_arm64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Mobile Safari/537.36",
-      //   "connection": "keep-alive",
-      //   "accept":
-      //       "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
-      //   // "accept-language": "en-US,en;q=0.9",
-      //   "accept-encoding": "gzip, deflate",
-      //   // "host": "192.168.50.114:8000",
-      //   // "referer": "http://192.168.50.114:8000/"
-      // };
-
-      _controller.loadRequest(uri, headers: headers);
-      return NavigationDecision.prevent;
+      return NavigationDecision.navigate;
     }
 
-    return NavigationDecision.navigate;
+    unawaited(
+      showAdaptiveDialog(
+        context: context,
+        barrierColor: Colors.transparent,
+        builder: (context) => CustomizedWebView(
+          url: uri,
+          browserSettings: widget.browserSettings,
+        ),
+        useRootNavigator: false,
+      ),
+    );
+
+    return NavigationDecision.prevent;
   }
 
   void _onWebResourceError(WebResourceError error) {
@@ -407,34 +389,4 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
 
     return jsonDecode(message);
   }
-
-  // Future<NavigationActionPolicy?> _shouldOverrideUrlLoading(
-  //   InAppWebViewController controller,
-  //   NavigationAction navigationAction,
-  // ) async {
-  //   final url = navigationAction.request.url;
-  //   debugPrint('_shouldOverrideUrlLoading: $url, host=${url?.host}');
-  //
-  //   if (url == null ||
-  //       url.toString() == 'about:blank' ||
-  //       url.toString() == widget.urlRequest?.url.toString() ||
-  //       url.toString().endsWith('/ada_chat_flutter/assets/embed.html') ||
-  //       url.host == '${widget.handle}.ada.support') {
-  //     return NavigationActionPolicy.ALLOW;
-  //   }
-  //
-  //   unawaited(
-  //     showAdaptiveDialog(
-  //       context: context,
-  //       barrierColor: Colors.transparent,
-  //       builder: (context) => CustomizedWebView(
-  //         url: url,
-  //         browserSettings: widget.browserSettings,
-  //       ),
-  //       useRootNavigator: false,
-  //     ),
-  //   );
-  //
-  //   return NavigationActionPolicy.CANCEL;
-  // }
 }
