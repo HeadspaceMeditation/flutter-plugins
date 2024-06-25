@@ -161,7 +161,10 @@ class _AdaWebViewState extends State<AdaWebView> {
 
     final platform = _controller.platform;
     if (platform is AndroidWebViewController) {
-      AndroidWebViewController.enableDebugging(true);
+      // AndroidWebViewController.enableDebugging(true);
+      // platform.setTextZoom(200);
+      // platform.setUserAgent(
+      //     "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36");
     }
     // else if (platform is WebKitWebViewController) {}
 
@@ -194,10 +197,7 @@ class _AdaWebViewState extends State<AdaWebView> {
     log('AdaWebView:onNavigationRequest: '
         'url=${uri.toString()}, isMainFrame=${request.isMainFrame}');
 
-    if (uri.host == '${widget.handle}.ada.support' ||
-        uri.toString() == 'about:blank') {
-      // final requestUri = Uri.parse(request.url);
-
+    if (_isAdaChatLink(uri) || _isAdaSupportLink(uri) || _isBlankPage(uri)) {
       return NavigationDecision.navigate;
     }
 
@@ -215,6 +215,12 @@ class _AdaWebViewState extends State<AdaWebView> {
 
     return NavigationDecision.prevent;
   }
+
+  bool _isBlankPage(Uri uri) => uri.toString() == 'about:blank';
+
+  bool _isAdaSupportLink(Uri uri) => uri.host == '${widget.handle}.ada.support';
+
+  bool _isAdaChatLink(Uri uri) => uri == widget.embedUri;
 
   void _onWebResourceError(WebResourceError error) {
     log('AdaWebView:onWebResourceError: '
