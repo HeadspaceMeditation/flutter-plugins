@@ -18,8 +18,7 @@ Check the example folder.
 
 ### embedUri parameter
 
-File with following content should be placed somewhere on your web server. Link to that html file 
-must be passed as `embedUri` parameter to `AdaWebView` widget.
+File with following content should be placed somewhere on your web server. 
 
 ```html
 <!DOCTYPE html>
@@ -45,6 +44,10 @@ must be passed as `embedUri` parameter to `AdaWebView` widget.
 
 </html>
 ```
+
+Link to that html file must be passed as `embedUri` parameter to `AdaWebView` widget.
+
+Don't forged to add yor domain to allow list on Ada dashboard.
 
 ### handle parameter
 
