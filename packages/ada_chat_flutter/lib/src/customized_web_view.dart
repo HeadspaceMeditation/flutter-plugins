@@ -31,6 +31,7 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onUrlChange: _onUrlChange,
+          onProgress: _onProgress,
           onPageStarted: _onPageStarted,
           onPageFinished: _onPageFinished,
           onNavigationRequest: _onNavigationRequest,
@@ -90,6 +91,17 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
 // parent.appendChild(style);
 // ''');
 //   }
+
+  void _onProgress(int progress) {
+    log('CustomizedWebView:onProgress: progress=$progress');
+
+    final pageController = widget.browserSettings?.control;
+    if (pageController == null) {
+      return;
+    }
+
+    pageController.setProgress(progress);
+  }
 
   Future<void> _onPageStarted(String url) async {
     log('CustomizedWebView:onPageStarted: url=$url');

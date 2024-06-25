@@ -3,11 +3,12 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 class BrowserController extends ChangeNotifier {
   WebViewController? _controller;
-  String _title = '';
-  String _host = '';
-  bool _isHttps = true;
-  bool _backIsAvailable = false;
-  bool _forwardIsAvailable = false;
+  var _title = '';
+  var _host = '';
+  var _isHttps = true;
+  var _backIsAvailable = false;
+  var _forwardIsAvailable = false;
+  var _progress = 0;
 
   void init(WebViewController controller) => _controller = controller;
 
@@ -50,5 +51,19 @@ class BrowserController extends ChangeNotifier {
   void setForwardIsAvailable(bool isAvailable) {
     _forwardIsAvailable = isAvailable;
     notifyListeners();
+  }
+
+  int get progress => _progress;
+
+  void setProgress(int progress) {
+    _progress = progress;
+    notifyListeners();
+  }
+
+  @override
+  String toString() {
+    return 'BrowserController{title: $_title, host: $_host, '
+        'isHttps: $_isHttps, backIsAvailable: $_backIsAvailable, '
+        'forwardIsAvailable: $_forwardIsAvailable, progress: $_progress}';
   }
 }
