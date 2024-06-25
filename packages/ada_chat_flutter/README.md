@@ -47,7 +47,7 @@ File with following content should be placed somewhere on your web server.
 
 Link to that html file must be passed as `embedUri` parameter to `AdaWebView` widget.
 
-Don't forged to add yor domain to allow list on Ada dashboard.
+Don't forget to add yor domain to the allow list on Ada dashboard.
 
 ### handle parameter
 
