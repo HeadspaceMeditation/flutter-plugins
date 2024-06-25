@@ -305,16 +305,13 @@ window.adaSettings = {
     });
   },
   conversationEndCallback: function(event) {
-    console.log("onConversationEnd: " + JSON.stringify(event));
     onConversationEnd.postMessage(JSON.stringify(event));
   },
   toggleCallback: function(isDrawerOpen) {
-    console.log("onDrawerToggle: " + JSON.stringify(isDrawerOpen));
     onDrawerToggle.postMessage(JSON.stringify(isDrawerOpen));
   },
   eventCallbacks: {
     "*": function(event) {
-      console.log("onEvent: " + JSON.stringify(event));
       onEvent.postMessage(JSON.stringify(event));
     }
   }

@@ -62,18 +62,18 @@ class PageDescription extends StatelessWidget {
             style: Theme.of(context).textTheme.bodySmall,
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                controller.isHttps ? Icons.lock : Icons.lock_open,
-                size: 10,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  controller.host,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyMedium,
+              if (controller.host.isNotEmpty)
+                Icon(
+                  controller.isHttps ? Icons.lock : Icons.lock_open,
+                  size: 10,
                 ),
+              const SizedBox(width: 8),
+              Text(
+                controller.host,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
           ),

@@ -84,7 +84,7 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                 onConversationEnd: (event) =>
                     log('AdaChatScreen:onConversationEnd: event=$event'),
                 onDrawerToggle: (isDrawerOpen) =>
-                    log('AdaChatScreen:onConversationEnd: '
+                    log('AdaChatScreen:onDrawerToggle: '
                         'isDrawerOpen=$isDrawerOpen'),
                 onLoadingError: (request, response) =>
                     log('AdaChatScreen:onLoadingError: '
