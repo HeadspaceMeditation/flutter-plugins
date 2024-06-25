@@ -59,11 +59,4 @@ class BrowserController extends ChangeNotifier {
     _progress = progress;
     notifyListeners();
   }
-
-  @override
-  String toString() {
-    return 'BrowserController{title: $_title, host: $_host, '
-        'isHttps: $_isHttps, backIsAvailable: $_backIsAvailable, '
-        'forwardIsAvailable: $_forwardIsAvailable, progress: $_progress}';
-  }
 }

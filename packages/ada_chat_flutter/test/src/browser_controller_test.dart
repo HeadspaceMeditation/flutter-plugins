@@ -1,17 +1,16 @@
 import 'package:ada_chat_flutter/src/browser_controller.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
-class MockInAppWebViewController extends Mock
-    implements InAppWebViewController {}
+class MockWebViewController extends Mock implements WebViewController {}
 
 void main() {
   late BrowserController browserController;
-  late MockInAppWebViewController mockController;
+  late MockWebViewController mockController;
 
   setUp(() {
-    mockController = MockInAppWebViewController();
+    mockController = MockWebViewController();
     browserController = BrowserController();
     browserController.init(mockController);
 
@@ -20,7 +19,7 @@ void main() {
     when(() => mockController.reload()).thenAnswer((_) async {});
   });
 
-  group('BrowserController', () {
+  group('BrowserController - ', () {
     test('goBack calls controller.goBack', () async {
       await browserController.goBack();
       verify(() => mockController.goBack()).called(1);
@@ -40,6 +39,12 @@ void main() {
       const newTitle = 'New Title';
       browserController.setTitle(newTitle);
       expect(browserController.title, newTitle);
+    });
+
+    test('progress getter returns correct value', () {
+      const progress = 42;
+      browserController.setProgress(progress);
+      expect(browserController.progress, progress);
     });
 
     test('host getter returns correct value', () {

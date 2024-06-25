@@ -161,12 +161,8 @@ class _AdaWebViewState extends State<AdaWebView> {
 
     final platform = _controller.platform;
     if (platform is AndroidWebViewController) {
-      // AndroidWebViewController.enableDebugging(true);
-      // platform.setTextZoom(200);
-      // platform.setUserAgent(
-      //     "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36");
+      AndroidWebViewController.enableDebugging(kDebugMode);
     }
-    // else if (platform is WebKitWebViewController) {}
 
     _controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
