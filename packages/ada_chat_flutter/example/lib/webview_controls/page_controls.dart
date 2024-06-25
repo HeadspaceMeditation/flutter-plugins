@@ -32,8 +32,8 @@ class PageControlsInner extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
           child: Row(
             children: [
-              ArrowBackButton(controller: controller),
-              ArrowForwardButton(controller: controller),
+              BackArrowButton(controller: controller),
+              ForwardArrowButton(controller: controller),
               RefreshButton(controller: controller),
               Expanded(
                 child: PageDescription(controller: controller),
@@ -82,9 +82,7 @@ class PageDescription extends StatelessWidget {
 }
 
 class CloseButton extends StatelessWidget {
-  const CloseButton({
-    super.key,
-  });
+  const CloseButton({super.key});
 
   @override
   Widget build(BuildContext context) => IconButton(
@@ -108,8 +106,8 @@ class RefreshButton extends StatelessWidget {
       );
 }
 
-class ArrowForwardButton extends StatelessWidget {
-  const ArrowForwardButton({
+class ForwardArrowButton extends StatelessWidget {
+  const ForwardArrowButton({
     super.key,
     required this.controller,
   });
@@ -123,8 +121,8 @@ class ArrowForwardButton extends StatelessWidget {
       );
 }
 
-class ArrowBackButton extends StatelessWidget {
-  const ArrowBackButton({
+class BackArrowButton extends StatelessWidget {
+  const BackArrowButton({
     super.key,
     required this.controller,
   });
