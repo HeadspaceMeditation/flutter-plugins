@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:ada_chat_flutter/ada_chat_flutter.dart';
 import 'package:example/webview_controls/page_with_controls.dart';
 import 'package:example/widgets/commands_menu.dart';
+import 'package:example/widgets/progress_bar.dart';
 import 'package:flutter/material.dart';
 
 class AdaChatScreen extends StatefulWidget {
@@ -19,7 +20,7 @@ class AdaChatScreen extends StatefulWidget {
 
 class _AdaChatScreenState extends State<AdaChatScreen> {
   final _adaController = AdaController();
-  var _progress = 0.0;
+  var _progress = 0;
 
   @override
   Widget build(BuildContext context) => SafeArea(
@@ -59,7 +60,7 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                   'keySens': 'valueSens',
                 },
                 onProgressChanged: (progress) => setState(() {
-                  _progress = progress / 100;
+                  _progress = progress;
                 }),
                 browserSettings: BrowserSettings(
                   pageBuilder: (context, browser, controller) => Scaffold(
@@ -89,17 +90,9 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                     log('AdaChatScreen:onLoadingError: '
                         'request=$request, response=$response'),
               ),
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 500),
-                top: _isNotLoading ? -5 : 0,
-                left: 0,
-                right: 0,
-                child: LinearProgressIndicator(value: _progress, minHeight: 5),
-              ),
+              ProgressBar(progress: _progress),
             ],
           ),
         ),
       );
-
-  bool get _isNotLoading => _progress == 0 || _progress == 1;
 }
