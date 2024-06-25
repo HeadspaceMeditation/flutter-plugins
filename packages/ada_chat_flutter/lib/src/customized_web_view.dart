@@ -77,10 +77,11 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
     final canGoForward = await _webViewController.canGoForward();
     pageController.setForwardIsAvailable(canGoForward);
 
-    // todo Refactor POC, move outside of the library
+    // todo POC for MSE-187, move outside of the library
     // await _hideAdaButton();
   }
 
+  // todo POC for MSE-187, move outside of the library
   /// Explanation: https://developers.ada.cx/reference/customize-chat#hide-the-default-chat-button
 //   Future<void> _hideAdaButton() {
 //     return _webViewController.runJavaScript('''
@@ -113,6 +114,7 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
     final uri = Uri.parse(request.url);
     log('CustomizedWebView:onNavigationRequest: url=$uri');
 
+    // todo POC for MSE-187, move outside of the library
     // if (uri
     //     .toString()
     //     .contains(RegExp(r'^https://headspace.ada.support/embed/'))) {
