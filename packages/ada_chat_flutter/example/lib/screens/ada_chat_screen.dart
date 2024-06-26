@@ -37,9 +37,8 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
           body: Stack(
             children: [
               AdaWebView(
-                embedUri:
-                    Uri.parse('https://dev.ginger.io/static/ada/embed.html'),
-                handle: 'headspace-sandbox',
+                embedUri: Uri.parse('https://my-company.com/ada/embed.html'),
+                handle: 'my-company-handle',
                 name: 'User 1',
                 email: 'qqq@google.com',
                 phone: '+5342342131324',
@@ -69,7 +68,7 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                       ),
                     ),
                   ),
-                  adaHideUrls: [RegExp(r'^https://help.headspace.com/')],
+                  adaHideUrls: [RegExp(r'^https://help.my-company.com/')],
                 ),
                 onLoaded: (data) => log('AdaChatScreen:onLoaded: data=$data'),
                 onAdaReady: (isRolledOut) {
