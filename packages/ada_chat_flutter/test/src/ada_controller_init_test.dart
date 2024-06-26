@@ -1,38 +1,31 @@
+import 'package:ada_chat_flutter/src/ada_controller.dart';
 import 'package:ada_chat_flutter/src/ada_controller_init.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
-class MockInAppWebViewController extends Mock
-    implements InAppWebViewController {}
-
-class AdaControllerInitImpl extends AdaControllerInit {
-  @override
-  void start() {}
-
-  @override
-  void triggerAnswer(String answerId) {}
-}
+class MockWebViewController extends Mock implements WebViewController {}
 
 void main() {
   group('AdaControllerInit tests - ', () {
-    late AdaControllerInitImpl adaControllerInit;
-    late MockInAppWebViewController mockInAppWebViewController;
+    late AdaControllerInit adaController;
+    late MockWebViewController mockWebViewController;
 
     setUp(() {
-      mockInAppWebViewController = MockInAppWebViewController();
-      adaControllerInit = AdaControllerInitImpl();
+      adaController = AdaController();
+      mockWebViewController = MockWebViewController();
     });
 
     test(
         'WHEN init called '
         'THEN should initialize inner state', () {
-      adaControllerInit.init(
-        webViewController: mockInAppWebViewController,
+      adaController.init(
+        webViewController: mockWebViewController,
         handle: 'testHandle',
       );
-      expect(adaControllerInit.webViewController, mockInAppWebViewController);
-      expect(adaControllerInit.handle, 'testHandle');
+
+      expect(adaController.webViewController, mockWebViewController);
+      expect(adaController.handle, 'testHandle');
     });
   });
 }

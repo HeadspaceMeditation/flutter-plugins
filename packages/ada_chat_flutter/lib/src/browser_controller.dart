@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class BrowserController extends ChangeNotifier {
-  InAppWebViewController? _controller;
-  String _title = '';
-  String _host = '';
-  bool _isHttps = true;
-  bool _backIsAvailable = false;
-  bool _forwardIsAvailable = false;
+  WebViewController? _controller;
+  var _title = '';
+  var _host = '';
+  var _isHttps = true;
+  var _backIsAvailable = false;
+  var _forwardIsAvailable = false;
+  var _progress = 0;
 
-  void init(InAppWebViewController controller) => _controller = controller;
+  void init(WebViewController controller) => _controller = controller;
 
   Future<void> goBack() async => _controller?.goBack();
 
@@ -49,6 +50,13 @@ class BrowserController extends ChangeNotifier {
 
   void setForwardIsAvailable(bool isAvailable) {
     _forwardIsAvailable = isAvailable;
+    notifyListeners();
+  }
+
+  int get progress => _progress;
+
+  void setProgress(int progress) {
+    _progress = progress;
     notifyListeners();
   }
 }

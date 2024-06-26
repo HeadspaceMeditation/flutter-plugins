@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:ada_chat_flutter/ada_chat_flutter.dart';
 import 'package:flutter/material.dart';
 
-class PageControls extends StatefulWidget {
+class PageControls extends StatelessWidget {
   const PageControls({
     super.key,
     required this.controller,
@@ -12,84 +12,126 @@ class PageControls extends StatefulWidget {
   final BrowserController controller;
 
   @override
-  State<PageControls> createState() => _PageControlsState();
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: controller,
+        builder: (context, _) => PageControlsInner(controller: controller),
+      );
 }
 
-class _PageControlsState extends State<PageControls> {
-  @override
-  void initState() {
-    super.initState();
-    widget.controller.addListener(_rebuild);
-  }
+class PageControlsInner extends StatelessWidget {
+  const PageControlsInner({
+    super.key,
+    required this.controller,
+  });
+
+  final BrowserController controller;
 
   @override
-  void dispose() {
-    widget.controller.removeListener(_rebuild);
-    super.dispose();
-  }
-
-  void _rebuild() => setState(() {});
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: ClipRect(
+  Widget build(BuildContext context) => ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
           child: Row(
             children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back_ios),
-                onPressed: widget.controller.backIsAvailable
-                    ? widget.controller.goBack
-                    : null,
-              ),
-              IconButton(
-                icon: const Icon(Icons.arrow_forward_ios),
-                onPressed: widget.controller.forwardIsAvailable
-                    ? widget.controller.goForward
-                    : null,
-              ),
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: widget.controller.reload,
-              ),
+              BackArrowButton(controller: controller),
+              ForwardArrowButton(controller: controller),
+              RefreshButton(controller: controller),
               Expanded(
-                child: Column(
-                  children: [
-                    Text(
-                      widget.controller.title,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          widget.controller.isHttps
-                              ? Icons.lock
-                              : Icons.lock_open,
-                          size: 10,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          widget.controller.host,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                child: PageDescription(controller: controller),
               ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: Navigator.of(context).pop,
-              ),
+              CloseButton(),
             ],
           ),
         ),
-      ),
-    );
-  }
+      );
+}
+
+class PageDescription extends StatelessWidget {
+  const PageDescription({
+    super.key,
+    required this.controller,
+  });
+
+  final BrowserController controller;
+
+  @override
+  Widget build(BuildContext context) => Column(
+        children: [
+          Text(
+            controller.title,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (controller.host.isNotEmpty)
+                Icon(
+                  controller.isHttps ? Icons.lock : Icons.lock_open,
+                  size: 10,
+                ),
+              const SizedBox(width: 8),
+              Text(
+                controller.host,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        ],
+      );
+}
+
+class CloseButton extends StatelessWidget {
+  const CloseButton({super.key});
+
+  @override
+  Widget build(BuildContext context) => IconButton(
+        icon: const Icon(Icons.close),
+        onPressed: Navigator.of(context).pop,
+      );
+}
+
+class RefreshButton extends StatelessWidget {
+  const RefreshButton({
+    super.key,
+    required this.controller,
+  });
+
+  final BrowserController controller;
+
+  @override
+  Widget build(BuildContext context) => IconButton(
+        icon: const Icon(Icons.refresh),
+        onPressed: controller.reload,
+      );
+}
+
+class ForwardArrowButton extends StatelessWidget {
+  const ForwardArrowButton({
+    super.key,
+    required this.controller,
+  });
+
+  final BrowserController controller;
+
+  @override
+  Widget build(BuildContext context) => IconButton(
+        icon: const Icon(Icons.arrow_forward_ios),
+        onPressed: controller.forwardIsAvailable ? controller.goForward : null,
+      );
+}
+
+class BackArrowButton extends StatelessWidget {
+  const BackArrowButton({
+    super.key,
+    required this.controller,
+  });
+
+  final BrowserController controller;
+
+  @override
+  Widget build(BuildContext context) => IconButton(
+        icon: const Icon(Icons.arrow_back_ios),
+        onPressed: controller.backIsAvailable ? controller.goBack : null,
+      );
 }

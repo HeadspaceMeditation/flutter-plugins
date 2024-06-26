@@ -1,6 +1,7 @@
 import 'package:ada_chat_flutter/ada_chat_flutter.dart';
 import 'package:example/webview_controls/page_controls.dart';
 import 'package:example/widgets/horizontal_line.dart';
+import 'package:example/widgets/progress_bar.dart';
 import 'package:flutter/material.dart';
 
 class PageWithControls extends StatelessWidget {
@@ -24,6 +25,10 @@ class PageWithControls extends StatelessWidget {
             PageControls(controller: controller),
             const HorizontalLine(),
           ],
+        ),
+        ListenableBuilder(
+          listenable: controller,
+          builder: (context, _) => ProgressBar(progress: controller.progress),
         ),
       ],
     );

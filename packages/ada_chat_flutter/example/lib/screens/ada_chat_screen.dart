@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:ada_chat_flutter/ada_chat_flutter.dart';
 import 'package:example/webview_controls/page_with_controls.dart';
 import 'package:example/widgets/commands_menu.dart';
+import 'package:example/widgets/progress_bar.dart';
 import 'package:flutter/material.dart';
 
 class AdaChatScreen extends StatefulWidget {
@@ -17,7 +20,7 @@ class AdaChatScreen extends StatefulWidget {
 
 class _AdaChatScreenState extends State<AdaChatScreen> {
   final _adaController = AdaController();
-  var _progress = 0.0;
+  var _progress = 0;
 
   @override
   Widget build(BuildContext context) => SafeArea(
@@ -34,6 +37,9 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
           body: Stack(
             children: [
               AdaWebView(
+                urlRequest: Uri.parse(
+                  'https://your.domain.com/embed.html',
+                ),
                 handle: 'example-handle',
                 name: 'User 1',
                 email: 'qqq@google.com',
@@ -54,13 +60,8 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                   'keySens': 'valueSens',
                 },
                 onProgressChanged: (progress) => setState(() {
-                  _progress = progress / 100;
+                  _progress = progress;
                 }),
-                onAdaReady: (isRolledOut) {
-                  debugPrint(
-                      'AdaChatScreen:onAdaReady: isRolledOut=$isRolledOut');
-                  setState(() => _progress = 0);
-                },
                 browserSettings: BrowserSettings(
                   pageBuilder: (context, browser, controller) => Scaffold(
                     body: SafeArea(
@@ -71,32 +72,27 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                     ),
                   ),
                 ),
-                onLoaded: (data) =>
-                    debugPrint('AdaChatScreen:onLoaded: data=$data'),
-                onEvent: (event) =>
-                    debugPrint('AdaChatScreen:onEvent: event=$event'),
+                onLoaded: (data) => log('AdaChatScreen:onLoaded: data=$data'),
+                onAdaReady: (isRolledOut) {
+                  log('AdaChatScreen:onAdaReady: isRolledOut=$isRolledOut');
+                  setState(() => _progress = 0);
+                },
+                onEvent: (event) => log('AdaChatScreen:onEvent: event=$event'),
                 onConsoleMessage: (level, message) =>
-                    debugPrint('AdaChatScreen:onConsoleMessage: '
+                    log('AdaChatScreen:onConsoleMessage: '
                         'level=$level, message=$message'),
                 onConversationEnd: (event) =>
-                    debugPrint('AdaChatScreen:onConversationEnd: event=$event'),
-                onDrawerToggle: (isDrawerOpen) => debugPrint(
-                    'AdaChatScreen:onConversationEnd: isDrawerOpen=$isDrawerOpen'),
-                onLoadingError: (request, error) =>
-                    debugPrint('AdaChatScreen:onLoadingError: '
-                        'request=$request, error=$error'),
+                    log('AdaChatScreen:onConversationEnd: event=$event'),
+                onDrawerToggle: (isDrawerOpen) =>
+                    log('AdaChatScreen:onDrawerToggle: '
+                        'isDrawerOpen=$isDrawerOpen'),
+                onLoadingError: (request, response) =>
+                    log('AdaChatScreen:onLoadingError: '
+                        'request=$request, response=$response'),
               ),
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 500),
-                top: _isNotLoading ? -5 : 0,
-                left: 0,
-                right: 0,
-                child: LinearProgressIndicator(value: _progress, minHeight: 5),
-              ),
+              ProgressBar(progress: _progress),
             ],
           ),
         ),
       );
-
-  bool get _isNotLoading => _progress == 0 || _progress == 1;
 }

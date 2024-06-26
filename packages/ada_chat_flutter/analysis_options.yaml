@@ -2,19 +2,19 @@ include: package:flutter_lints/flutter.yaml
 
 linter:
   rules:
-    use_key_in_widget_constructors: false
-    no_adjacent_strings_in_list: false
-    literal_only_boolean_expressions: false
-    prefer_single_quotes: false
-    slash_for_doc_comments: false
-    curly_braces_in_flow_control_structures: false
-    omit_local_variable_types: false
-    use_function_type_syntax_for_parameters: false
-    prefer_const_constructors: false
-    non_constant_identifier_names: false
-    constant_identifier_names: false
     avoid_void_async: true
+    constant_identifier_names: false
+    curly_braces_in_flow_control_structures: false
+    literal_only_boolean_expressions: false
+    no_adjacent_strings_in_list: false
+    non_constant_identifier_names: false
+    omit_local_variable_types: false
+    prefer_const_constructors: false
     require_trailing_commas: true
+    slash_for_doc_comments: false
+    unawaited_futures: true
+    use_function_type_syntax_for_parameters: false
+    use_key_in_widget_constructors: false
 
 analyzer:
   exclude:

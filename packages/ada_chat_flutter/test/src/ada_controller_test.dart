@@ -1,12 +1,11 @@
 import 'dart:convert';
 
 import 'package:ada_chat_flutter/src/ada_controller.dart';
-import 'package:ada_chat_flutter/src/ada_exception.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
-class MockWebViewController extends Mock implements InAppWebViewController {}
+class MockWebViewController extends Mock implements WebViewController {}
 
 const _handle = '_testHandle';
 
@@ -25,10 +24,8 @@ void main() {
       );
 
       when(
-        () => mockWebViewController.evaluateJavascript(
-          source: any(named: 'source'),
-        ),
-      ).thenAnswer((_) async => null);
+        () => mockWebViewController.runJavaScript(any()),
+      ).thenAnswer((_) async {});
     });
 
     test(
@@ -36,9 +33,8 @@ void main() {
         'THEN should call evaluateJavascript with correct args', () {
       adaController.start();
       verify(
-        () => mockWebViewController.evaluateJavascript(
-          source: any(
-            named: 'source',
+        () => mockWebViewController.runJavaScript(
+          any(
             that: predicate(
               (arg) =>
                   arg is String &&
@@ -56,9 +52,8 @@ void main() {
         'THEN should call evaluateJavascript with correct args', () {
       adaController.deleteHistory();
       verify(
-        () => mockWebViewController.evaluateJavascript(
-          source: any(
-            named: 'source',
+        () => mockWebViewController.runJavaScript(
+          any(
             that: predicate(
               (arg) =>
                   arg is String && arg.contains('adaEmbed.deleteHistory()'),
@@ -68,62 +63,24 @@ void main() {
       ).called(1);
     });
 
-    group('getInfo', () {
-      test(
-          'WHEN getInfo is called '
-          'THEN should call callAsyncJavaScript with correct args', () async {
-        when(
-          () => mockWebViewController.callAsyncJavaScript(
-            functionBody: any(named: 'functionBody'),
-          ),
-        ).thenAnswer(
-          (_) async => CallAsyncJavaScriptResult(
-            value: {
-              'info': true,
-            },
-          ),
-        );
-        final result = await adaController.getInfo();
-        expect(result, {'info': true});
-        verify(
-          () => mockWebViewController.callAsyncJavaScript(
-            functionBody: any(
-              named: 'functionBody',
-              that: predicate(
-                (arg) => arg is String && arg.contains('adaEmbed.getInfo()'),
-              ),
+    test(
+        'WHEN getInfo is called '
+        'THEN should call callAsyncJavaScript with correct args', () async {
+      when(
+        () => mockWebViewController.runJavaScriptReturningResult(any()),
+      ).thenAnswer((_) async => '{"info": true}');
+
+      final result = await adaController.getInfo();
+      expect(result, '{"info": true}');
+      verify(
+        () => mockWebViewController.runJavaScriptReturningResult(
+          any(
+            that: predicate(
+              (arg) => arg is String && arg.contains('adaEmbed.getInfo()'),
             ),
           ),
-        ).called(1);
-      });
-
-      test(
-          'WHEN getInfo is called and it throws an AdaNullResultException'
-          'THEN should throw AdaNullResultException', () async {
-        when(
-          () => mockWebViewController.callAsyncJavaScript(
-            functionBody: any(named: 'functionBody'),
-          ),
-        ).thenAnswer((_) async => null);
-        expect(
-          () async => await adaController.getInfo(),
-          throwsA(isA<AdaNullResultException>()),
-        );
-      });
-
-      test(
-          'WHEN getInfo is called and it completes with an error'
-          'THEN should throw AdaExecException', () async {
-        when(
-          () => mockWebViewController.callAsyncJavaScript(
-            functionBody: any(named: 'functionBody'),
-          ),
-        ).thenAnswer((_) async => CallAsyncJavaScriptResult(error: 'Error'));
-        expect(
-          () async => await adaController.getInfo(),
-          throwsA(isA<AdaExecException>()),
-        );
-      });
+        ),
+      ).called(1);
     });
 
     test(
@@ -131,9 +88,8 @@ void main() {
         'THEN should call evaluateJavascript with correct args', () {
       adaController.reset();
       verify(
-        () => mockWebViewController.evaluateJavascript(
-          source: any(
-            named: 'source',
+        () => mockWebViewController.runJavaScript(
+          any(
             that: predicate(
               (arg) => arg is String && arg.contains('adaEmbed.reset()'),
             ),
@@ -147,9 +103,8 @@ void main() {
         'THEN should call evaluateJavascript with correct args', () {
       adaController.setLanguage('en');
       verify(
-        () => mockWebViewController.evaluateJavascript(
-          source: any(
-            named: 'source',
+        () => mockWebViewController.runJavaScript(
+          any(
             that: predicate(
               (arg) =>
                   arg is String && arg.contains('adaEmbed.setLanguage("en")'),
@@ -166,9 +121,8 @@ void main() {
 
       await adaController.setMetaFields(fields);
       verify(
-        () => mockWebViewController.evaluateJavascript(
-          source: any(
-            named: 'source',
+        () => mockWebViewController.runJavaScript(
+          any(
             that: predicate(
               (arg) =>
                   arg is String &&
@@ -187,9 +141,8 @@ void main() {
 
       await adaController.setSensitiveMetaFields(fields);
       verify(
-        () => mockWebViewController.evaluateJavascript(
-          source: any(
-            named: 'source',
+        () => mockWebViewController.runJavaScript(
+          any(
             that: predicate(
               (arg) =>
                   arg is String &&
@@ -206,9 +159,8 @@ void main() {
         'THEN should call evaluateJavascript with correct args', () {
       adaController.stop();
       verify(
-        () => mockWebViewController.evaluateJavascript(
-          source: any(
-            named: 'source',
+        () => mockWebViewController.runJavaScript(
+          any(
             that: predicate(
               (arg) => arg is String && arg.contains('adaEmbed.stop()'),
             ),
@@ -222,9 +174,8 @@ void main() {
         'THEN should call evaluateJavascript with correct args', () {
       adaController.triggerAnswer('answerId');
       verify(
-        () => mockWebViewController.evaluateJavascript(
-          source: any(
-            named: 'source',
+        () => mockWebViewController.runJavaScript(
+          any(
             that: predicate(
               (arg) =>
                   arg is String &&
