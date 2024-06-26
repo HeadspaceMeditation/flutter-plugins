@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:ada_chat_flutter/src/ada_button_hide.dart';
 import 'package:ada_chat_flutter/src/browser_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -20,10 +21,15 @@ class CustomizedWebView extends StatefulWidget {
 
 class _CustomizedWebViewState extends State<CustomizedWebView> {
   late final WebViewController _webViewController = WebViewController();
+  late final AdaButtonHide _adaButtonHide = AdaButtonHide(
+    webViewController: _webViewController,
+    adaHideUrls: widget.browserSettings?.adaHideUrls ?? [],
+  );
 
   @override
   void initState() {
     super.initState();
+
     widget.browserSettings?.init();
 
     _webViewController
@@ -76,21 +82,8 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
     final canGoForward = await _webViewController.canGoForward();
     pageController.setForwardIsAvailable(canGoForward);
 
-    // todo POC for MSE-187, move outside of the library
-    // await _hideAdaButton();
+    await _adaButtonHide.maybeHideButton(url);
   }
-
-  // todo POC for MSE-187, move outside of the library
-  /// Explanation: https://developers.ada.cx/reference/customize-chat#hide-the-default-chat-button
-//   Future<void> _hideAdaButton() {
-//     return _webViewController.runJavaScript('''
-// var parent = document.getElementsByTagName('body').item(0);
-// var style = document.createElement('style');
-// style.type = 'text/css';
-// style.innerHTML = "#ada-button-frame{ display: none; }";
-// parent.appendChild(style);
-// ''');
-//   }
 
   void _onProgress(int progress) {
     log('CustomizedWebView:onProgress: progress=$progress');
@@ -109,16 +102,16 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
   Future<NavigationDecision> _onNavigationRequest(
     NavigationRequest request,
   ) async {
-    final uri = Uri.parse(request.url);
-    log('CustomizedWebView:onNavigationRequest: url=$uri');
+    final requestUrl = request.url;
+    final currentUrl = await _webViewController.currentUrl() ?? '';
 
-    // todo POC for MSE-187, move outside of the library
-    // if (uri
-    //     .toString()
-    //     .contains(RegExp(r'^https://headspace.ada.support/embed/'))) {
-    //   log('CustomizedWebView:onNavigationRequest: skip url=$uri');
-    //   return NavigationDecision.prevent;
-    // }
+    log('CustomizedWebView:onNavigationRequest: currentUrl=$currentUrl, '
+        'requestUrl=$requestUrl');
+
+    if (_adaButtonHide.mustHideBalloon(currentUrl, requestUrl)) {
+      log('CustomizedWebView:onNavigationRequest: Hide Ada url=$requestUrl');
+      return NavigationDecision.prevent;
+    }
 
     return NavigationDecision.navigate;
   }

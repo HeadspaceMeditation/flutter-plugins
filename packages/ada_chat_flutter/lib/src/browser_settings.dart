@@ -16,6 +16,7 @@ typedef PageBuilder = Widget Function(
 class BrowserSettings {
   BrowserSettings({
     required this.pageBuilder,
+    this.adaHideUrls = const [],
   });
 
   @internal
@@ -23,6 +24,9 @@ class BrowserSettings {
 
   /// Custom page builder
   final PageBuilder pageBuilder;
+
+  /// List of URLs where the Ada chat button will be hidden
+  final List<RegExp> adaHideUrls;
 
   @internal
   void init() => control = BrowserController();

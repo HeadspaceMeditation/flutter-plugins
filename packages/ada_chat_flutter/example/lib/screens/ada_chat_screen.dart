@@ -69,6 +69,7 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                       ),
                     ),
                   ),
+                  adaHideUrls: [RegExp(r'^https://help.headspace.com/')],
                 ),
                 onLoaded: (data) => log('AdaChatScreen:onLoaded: data=$data'),
                 onAdaReady: (isRolledOut) {
