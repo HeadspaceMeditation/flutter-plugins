@@ -218,11 +218,10 @@ class _AdaWebViewState extends State<AdaWebView> {
 
   bool _isAdaChatLink(Uri uri) => uri == widget.embedUri;
 
-  void _onWebResourceError(WebResourceError error) {
-    log('AdaWebView:onWebResourceError: '
-        'errorCode=${error.errorCode}, '
-        'description=${error.description}');
-  }
+  void _onWebResourceError(WebResourceError error) =>
+      log('AdaWebView:onWebResourceError: '
+          'errorCode=${error.errorCode}, '
+          'description=${error.description}');
 
   void _onHttpError(HttpResponseError error) => widget.onLoadingError?.call(
         error.request?.uri.toString() ?? '',
@@ -240,19 +239,15 @@ class _AdaWebViewState extends State<AdaWebView> {
     });
   }
 
-  void _onPageStarted(String url) {
-    log('AdaWebView:onPageStarted: url=$url');
-  }
+  void _onPageStarted(String url) => log('AdaWebView:onPageStarted: url=$url');
 
   void _onProgress(int progress) => widget.onProgressChanged?.call(progress);
 
-  void _onUrlChange(UrlChange change) {
-    log('AdaWebView:onUrlChange: url=${change.url}');
-  }
+  void _onUrlChange(UrlChange change) =>
+      log('AdaWebView:onUrlChange: url=${change.url}');
 
-  void _onHttpAuthRequest(HttpAuthRequest request) {
-    log('AdaWebView:onHttpAuthRequest: host=${request.host}');
-  }
+  void _onHttpAuthRequest(HttpAuthRequest request) =>
+      log('AdaWebView:onHttpAuthRequest: host=${request.host}');
 
   @override
   Widget build(BuildContext context) => WebViewWidget(controller: _controller);

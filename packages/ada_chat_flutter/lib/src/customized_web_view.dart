@@ -47,9 +47,8 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
           'level=${message.level.toString()}, '
           'message=${message.message}');
 
-  void _onUrlChange(change) {
-    log('CustomizedWebView:onUrlChange: url=${change.url}');
-  }
+  void _onUrlChange(change) =>
+      log('CustomizedWebView:onUrlChange: url=${change.url}');
 
   Future<void> _onPageFinished(String url) async {
     log('CustomizedWebView:onPageFinished: url=$url');
@@ -104,9 +103,8 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
     pageController.setProgress(progress);
   }
 
-  Future<void> _onPageStarted(String url) async {
-    log('CustomizedWebView:onPageStarted: url=$url');
-  }
+  Future<void> _onPageStarted(String url) async =>
+      log('CustomizedWebView:onPageStarted: url=$url');
 
   Future<NavigationDecision> _onNavigationRequest(
     NavigationRequest request,

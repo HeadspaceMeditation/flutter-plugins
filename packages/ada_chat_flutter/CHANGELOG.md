@@ -1,3 +1,11 @@
+## 1.1.0
+
+- Block Ada chat button on selected pages.
+
+## 1.0.0
+
+- Rewrite with another webview library.
+
 ## 0.0.4
 
 - Add host and isHttp fields to the browser controller.
