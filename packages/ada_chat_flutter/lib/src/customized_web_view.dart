@@ -108,6 +108,7 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
     log('CustomizedWebView:onNavigationRequest: currentUrl=$currentUrl, '
         'requestUrl=$requestUrl');
 
+    // fixme Works only on iOS
     if (_adaButtonHide.mustHideBalloon(currentUrl, requestUrl)) {
       log('CustomizedWebView:onNavigationRequest: Hide Ada url=$requestUrl');
       return NavigationDecision.prevent;
