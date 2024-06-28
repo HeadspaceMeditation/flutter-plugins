@@ -6,8 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('BrowserSettings', () {
     test('init creates a BrowserController instance', () {
-      final settings =
-          BrowserSettings(pageBuilder: (_, __, ___) => Container());
+      final settings = BrowserSettings(
+        pageBuilder: (_, __, ___) => Container(),
+      );
       expect(settings.control, isNull);
       settings.init();
       expect(settings.control, isNotNull);
@@ -20,9 +21,6 @@ void main() {
           BrowserSettings(pageBuilder: (_, __, ___) => Container());
       settings.control = controller;
       settings.dispose();
-      // Since BrowserController.dispose() doesn't have any observable side effects,
-      // we can't directly verify it was called. However, this test ensures that
-      // the dispose method of BrowserSettings is correctly delegating to the controller.
     });
 
     test('pageBuilder is correctly stored', () {
@@ -36,6 +34,16 @@ void main() {
 
       final settings = BrowserSettings(pageBuilder: pageBuilder);
       expect(settings.pageBuilder, pageBuilder);
+    });
+
+    test('adaHideUrls is correctly stored', () {
+      final regexp = RegExp(r'^something$');
+      final settings = BrowserSettings(
+        pageBuilder: (_, __, ___) => Container(),
+        adaHideUrls: [regexp],
+      );
+      expect(settings.adaHideUrls.length, equals(1));
+      expect(settings.adaHideUrls, contains(regexp));
     });
   });
 }

@@ -37,10 +37,8 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
           body: Stack(
             children: [
               AdaWebView(
-                urlRequest: Uri.parse(
-                  'https://your.domain.com/embed.html',
-                ),
-                handle: 'example-handle',
+                embedUri: Uri.parse('https://my-company.com/ada/embed.html'),
+                handle: 'my-company-handle',
                 name: 'User 1',
                 email: 'qqq@google.com',
                 phone: '+5342342131324',
@@ -59,9 +57,8 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                 sensitiveMetaFields: const {
                   'keySens': 'valueSens',
                 },
-                onProgressChanged: (progress) => setState(() {
-                  _progress = progress;
-                }),
+                onProgressChanged: (progress) =>
+                    setState(() => _progress = progress),
                 browserSettings: BrowserSettings(
                   pageBuilder: (context, browser, controller) => Scaffold(
                     body: SafeArea(
@@ -71,6 +68,7 @@ class _AdaChatScreenState extends State<AdaChatScreen> {
                       ),
                     ),
                   ),
+                  adaHideUrls: [RegExp(r'^https://help.my-company.com/')],
                 ),
                 onLoaded: (data) => log('AdaChatScreen:onLoaded: data=$data'),
                 onAdaReady: (isRolledOut) {
