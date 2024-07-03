@@ -9,7 +9,7 @@ repository: https://github.com/HeadspaceMeditation/flutter-plugins/tree/master/p
 publish_to: none
 
 environment:
-  sdk: '>=2.19.0 <3.4.0'
+  sdk: '>=3.4.3 <4.0.0'
 
 dependencies:
   flutter:
