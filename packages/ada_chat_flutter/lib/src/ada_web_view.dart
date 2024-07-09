@@ -100,8 +100,9 @@ class AdaWebView extends StatefulWidget {
   final void Function(String request, String response)? onLoadingError;
 
   @override
-  State<AdaWebView> createState() => _AdaWebViewState();
+  State<AdaWebView> createState() => AdaWebViewState();
 
+  // coverage:ignore-start
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
@@ -135,9 +136,11 @@ class AdaWebView extends StatefulWidget {
     properties.add(DoubleProperty('rolloutOverride', rolloutOverride));
     properties.add(DiagnosticsProperty<bool>('testMode', testMode));
   }
+// coverage:ignore-end
 }
 
-class _AdaWebViewState extends State<AdaWebView> {
+@visibleForTesting
+class AdaWebViewState extends State<AdaWebView> {
   late final WebViewController _controller;
 
   @override
@@ -175,7 +178,7 @@ class _AdaWebViewState extends State<AdaWebView> {
           onUrlChange: _onUrlChange,
           onProgress: _onProgress,
           onPageStarted: _onPageStarted,
-          onPageFinished: _onPageFinished,
+          onPageFinished: onPageFinished,
           onHttpError: _onHttpError,
           onWebResourceError: _onWebResourceError,
           onNavigationRequest: _onNavigationRequest,
@@ -193,7 +196,7 @@ class _AdaWebViewState extends State<AdaWebView> {
     log('AdaWebView:onNavigationRequest: '
         'url=${uri.toString()}, isMainFrame=${request.isMainFrame}');
 
-    if (_isAdaChatLink(uri) || _isAdaSupportLink(uri) || _isBlankPage(uri)) {
+    if (isInternalAdaUrl(uri)) {
       return NavigationDecision.navigate;
     }
 
@@ -211,6 +214,10 @@ class _AdaWebViewState extends State<AdaWebView> {
 
     return NavigationDecision.prevent;
   }
+
+  @visibleForTesting
+  bool isInternalAdaUrl(Uri uri) =>
+      _isAdaChatLink(uri) || _isAdaSupportLink(uri) || _isBlankPage(uri);
 
   bool _isBlankPage(Uri uri) => uri.toString() == 'about:blank';
 
@@ -230,7 +237,8 @@ class _AdaWebViewState extends State<AdaWebView> {
         'headers=${error.response?.headers}, ',
       );
 
-  void _onPageFinished(String url) {
+  @visibleForTesting
+  void onPageFinished(String url) {
     log('AdaWebView:onPageFinished: url=$url');
 
     Future.delayed(Duration.zero, () async {
