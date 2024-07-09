@@ -9,8 +9,8 @@ import 'package:webview_flutter_platform_interface/src/types/load_request_params
 
 final webViewCalls = <String>[];
 
-class FakePlatformWebViewCookieManager extends PlatformWebViewCookieManager {
-  FakePlatformWebViewCookieManager(
+class _FakePlatformWebViewCookieManager extends PlatformWebViewCookieManager {
+  _FakePlatformWebViewCookieManager(
     super.params,
   ) : super.implementation();
 
@@ -23,16 +23,15 @@ class FakePlatformWebViewCookieManager extends PlatformWebViewCookieManager {
   Future<void> setCookie(WebViewCookie cookie) async {}
 }
 
-class FakeWebViewController extends PlatformWebViewController {
-  FakeWebViewController(super.params) : super.implementation();
+class _FakeWebViewController extends PlatformWebViewController {
+  _FakeWebViewController(super.params) : super.implementation();
 
   @override
   Future<void> addJavaScriptChannel(
     JavaScriptChannelParams javaScriptChannelParams,
   ) async =>
-      webViewCalls.add(
-        'addJavaScriptChannel: name=${javaScriptChannelParams.name}',
-      );
+      webViewCalls.add('addJavaScriptChannel: '
+          'name=${javaScriptChannelParams.name}');
 
   @override
   Future<bool> canGoBack() async {
@@ -89,9 +88,8 @@ class FakeWebViewController extends PlatformWebViewController {
   Future<void> loadHtmlString(String html, {String? baseUrl}) async {}
 
   @override
-  Future<void> loadRequest(LoadRequestParams params) async {
-    webViewCalls.add('loadRequest: uri=${params.uri}');
-  }
+  Future<void> loadRequest(LoadRequestParams params) async =>
+      webViewCalls.add('loadRequest: uri=${params.uri}');
 
   @override
   PlatformWebViewControllerCreationParams get params =>
@@ -110,9 +108,7 @@ class FakeWebViewController extends PlatformWebViewController {
 
   @override
   Future<Object> runJavaScriptReturningResult(String javaScript) async {
-    webViewCalls.add(
-      'runJavaScriptReturningResult: javaScript=$javaScript',
-    );
+    webViewCalls.add('runJavaScriptReturningResult: javaScript=$javaScript');
     return '{}';
   }
 
@@ -147,8 +143,8 @@ class FakeWebViewController extends PlatformWebViewController {
   Future<void> setUserAgent(String? userAgent) async {}
 }
 
-class FakeWebViewWidget extends PlatformWebViewWidget {
-  FakeWebViewWidget(super.params) : super.implementation();
+class _FakeWebViewWidget extends PlatformWebViewWidget {
+  _FakeWebViewWidget(super.params) : super.implementation();
 
   @override
   Widget build(BuildContext context) {
@@ -156,8 +152,8 @@ class FakeWebViewWidget extends PlatformWebViewWidget {
   }
 }
 
-class FakePlatformNavigationDelegate extends PlatformNavigationDelegate {
-  FakePlatformNavigationDelegate(super.params) : super.implementation();
+class _FakePlatformNavigationDelegate extends PlatformNavigationDelegate {
+  _FakePlatformNavigationDelegate(super.params) : super.implementation();
 
   @override
   Future<void> setOnPageStarted(PageEventCallback onPageStarted) async {}
@@ -197,27 +193,27 @@ class FakeWebViewPlatform extends WebViewPlatform {
   PlatformWebViewCookieManager createPlatformCookieManager(
     PlatformWebViewCookieManagerCreationParams params,
   ) {
-    return FakePlatformWebViewCookieManager(params);
+    return _FakePlatformWebViewCookieManager(params);
   }
 
   @override
   PlatformNavigationDelegate createPlatformNavigationDelegate(
     PlatformNavigationDelegateCreationParams params,
   ) {
-    return FakePlatformNavigationDelegate(params);
+    return _FakePlatformNavigationDelegate(params);
   }
 
   @override
   PlatformWebViewWidget createPlatformWebViewWidget(
     PlatformWebViewWidgetCreationParams params,
   ) {
-    return FakeWebViewWidget(params);
+    return _FakeWebViewWidget(params);
   }
 
   @override
   PlatformWebViewController createPlatformWebViewController(
     PlatformWebViewControllerCreationParams params,
   ) {
-    return FakeWebViewController(params);
+    return _FakeWebViewController(params);
   }
 }

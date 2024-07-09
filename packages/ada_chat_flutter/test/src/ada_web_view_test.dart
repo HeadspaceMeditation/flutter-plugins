@@ -8,7 +8,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import '../webview_mocks.dart';
 
-class MockAdaController extends Mock implements AdaController {}
+class _MockAdaController extends Mock implements AdaController {}
 
 const _title = '_title';
 const _regexp = '_regexp';
@@ -16,12 +16,12 @@ const _handle = '_handle';
 const _embedUri = 'https://example.com/embed.html';
 
 void main() {
-  late MockAdaController mockAdaController;
+  late _MockAdaController mockAdaController;
 
   setUp(() {
     WebViewPlatform.instance = FakeWebViewPlatform();
 
-    mockAdaController = MockAdaController();
+    mockAdaController = _MockAdaController();
 
     when(() => mockAdaController.start()).thenAnswer((_) async {});
   });
@@ -111,7 +111,7 @@ void main() {
   });
 }
 
-Widget _buildAdaWebView(MockAdaController mockAdaController) {
+Widget _buildAdaWebView(_MockAdaController mockAdaController) {
   return AdaWebView(
     embedUri: Uri.parse(_embedUri),
     handle: _handle,
