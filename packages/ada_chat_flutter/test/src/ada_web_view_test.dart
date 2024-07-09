@@ -71,7 +71,7 @@ void main() {
     testWidgets(
       'GIVEN the widget is pumped '
       'WHEN onPageFinished is called '
-      'THEN should rebuild correct result',
+      'THEN should init and start Ada with correct params',
       (WidgetTester tester) async {
         await tester.runAsync(() async {
           await tester.pumpWidget(
@@ -85,12 +85,26 @@ void main() {
           state.onPageFinished(_embedUri);
           await Future.delayed(Duration.zero);
 
+          verify(() => mockAdaController.start()).called(1);
           expect(
             webViewCalls,
-            equals(['loadRequest: uri=$_embedUri']),
+            contains('loadRequest: uri=https://example.com/embed.html'),
           );
-          verify(() => mockAdaController.start()).called(1);
-          // expect(state.isInternalAdaUrl(Uri.parse('google.com')), false);
+          expect(
+            webViewCalls,
+            contains('addJavaScriptChannel: name=onLoaded'),
+          );
+          expect(
+            webViewCalls,
+            anyElement(contains('"metaFields":{"key":"value"')),
+          );
+          expect(
+            webViewCalls,
+            anyElement(
+              contains('{"handle":"$_handle","language":"en","cluster":'
+                  'null,"domain":null,"hideMask":false'),
+            ),
+          );
         });
       },
     );

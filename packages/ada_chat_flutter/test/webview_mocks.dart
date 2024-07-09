@@ -29,7 +29,10 @@ class FakeWebViewController extends PlatformWebViewController {
   @override
   Future<void> addJavaScriptChannel(
     JavaScriptChannelParams javaScriptChannelParams,
-  ) async {}
+  ) async =>
+      webViewCalls.add(
+        'addJavaScriptChannel: name=${javaScriptChannelParams.name}',
+      );
 
   @override
   Future<bool> canGoBack() async {
@@ -101,11 +104,16 @@ class FakeWebViewController extends PlatformWebViewController {
   Future<void> removeJavaScriptChannel(String javaScriptChannelName) async {}
 
   @override
-  Future<void> runJavaScript(String javaScript) async {}
+  Future<void> runJavaScript(String javaScript) async => webViewCalls.add(
+        'runJavaScript: javaScript=$javaScript',
+      );
 
   @override
   Future<Object> runJavaScriptReturningResult(String javaScript) async {
-    return {};
+    webViewCalls.add(
+      'runJavaScriptReturningResult: javaScript=$javaScript',
+    );
+    return '{}';
   }
 
   @override
