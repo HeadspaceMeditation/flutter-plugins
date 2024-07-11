@@ -1,6 +1,7 @@
 import 'package:ada_chat_flutter/src/ada_controller.dart';
 import 'package:ada_chat_flutter/src/ada_web_view.dart';
 import 'package:ada_chat_flutter/src/browser_settings.dart';
+import 'package:ada_chat_flutter/src/customized_web_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -14,6 +15,23 @@ const _title = '_title';
 const _regexp = '_regexp';
 const _handle = '_handle';
 const _embedUri = 'https://example.com/embed.html';
+
+final _browserSettings = BrowserSettings(
+  pageBuilder: (
+    context,
+    browser,
+    controller,
+  ) =>
+      Column(
+    children: [
+      Text(_title),
+      browser,
+    ],
+  ),
+  adaHideUrls: [
+    RegExp(_regexp),
+  ],
+);
 
 void main() {
   late _MockAdaController mockAdaController;
@@ -41,30 +59,6 @@ void main() {
           webViewCalls,
           equals(['loadRequest: uri=$_embedUri']),
         );
-      },
-    );
-
-    testWidgets(
-      'GIVEN the widget is pumped '
-      'WHEN isInternalAdaUrl is called '
-      'THEN should rebuild correct result',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(
-          MaterialApp(
-            home: _buildAdaWebView(mockAdaController),
-          ),
-        );
-
-        final state = tester.state<AdaWebViewState>(find.byType(AdaWebView));
-
-        expect(state.isInternalAdaUrl(Uri.parse('about:blank')), true);
-        expect(
-          state.isInternalAdaUrl(Uri.parse('https://$_handle.ada.support/asd')),
-          true,
-        );
-        expect(state.isInternalAdaUrl(Uri.parse(_embedUri)), true);
-
-        expect(state.isInternalAdaUrl(Uri.parse('google.com')), false);
       },
     );
 
@@ -108,6 +102,38 @@ void main() {
         });
       },
     );
+
+    testWidgets(
+      'GIVEN the widget is pumped '
+      'WHEN onNavigationRequest is called for external page '
+      'THEN should show customized webview',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: _buildAdaWebView(mockAdaController),
+          ),
+        );
+
+        final state = tester.state<AdaWebViewState>(find.byType(AdaWebView));
+
+        state.onNavigationRequest(
+          NavigationRequest(
+            url: 'https://external-page.com/index.html',
+            isMainFrame: true,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text(_title), findsOneWidget);
+        expect(
+          find.byWidgetPredicate(
+            (w) =>
+                w is CustomizedWebView && w.browserSettings == _browserSettings,
+          ),
+          findsOneWidget,
+        );
+      },
+    );
   });
 }
 
@@ -119,21 +145,6 @@ Widget _buildAdaWebView(_MockAdaController mockAdaController) {
     rolloutOverride: 1,
     language: 'en',
     metaFields: const {'key': 'value'},
-    browserSettings: BrowserSettings(
-      pageBuilder: (
-        context,
-        browser,
-        controller,
-      ) =>
-          Column(
-        children: [
-          Text(_title),
-          browser,
-        ],
-      ),
-      adaHideUrls: [
-        RegExp(_regexp),
-      ],
-    ),
+    browserSettings: _browserSettings,
   );
 }

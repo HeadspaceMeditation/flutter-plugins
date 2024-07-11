@@ -181,7 +181,7 @@ class AdaWebViewState extends State<AdaWebView> {
           onPageFinished: onPageFinished,
           onHttpError: _onHttpError,
           onWebResourceError: _onWebResourceError,
-          onNavigationRequest: _onNavigationRequest,
+          onNavigationRequest: onNavigationRequest,
         ),
       );
 
@@ -191,12 +191,13 @@ class AdaWebViewState extends State<AdaWebView> {
   void _onConsoleMessage(JavaScriptConsoleMessage message) =>
       widget.onConsoleMessage?.call(message.level.toString(), message.message);
 
-  FutureOr<NavigationDecision> _onNavigationRequest(NavigationRequest request) {
+  @visibleForTesting
+  FutureOr<NavigationDecision> onNavigationRequest(NavigationRequest request) {
     final uri = Uri.parse(request.url);
     log('AdaWebView:onNavigationRequest: '
         'url=${uri.toString()}, isMainFrame=${request.isMainFrame}');
 
-    if (isInternalAdaUrl(uri)) {
+    if (isInternalAdaUrl(uri, widget.embedUri, widget.handle)) {
       return NavigationDecision.navigate;
     }
 
@@ -215,16 +216,6 @@ class AdaWebViewState extends State<AdaWebView> {
     return NavigationDecision.prevent;
   }
 
-  @visibleForTesting
-  bool isInternalAdaUrl(Uri uri) =>
-      _isAdaChatLink(uri) || _isAdaSupportLink(uri) || _isBlankPage(uri);
-
-  bool _isBlankPage(Uri uri) => uri.toString() == 'about:blank';
-
-  bool _isAdaSupportLink(Uri uri) => uri.host == '${widget.handle}.ada.support';
-
-  bool _isAdaChatLink(Uri uri) => uri == widget.embedUri;
-
   void _onWebResourceError(WebResourceError error) =>
       log('AdaWebView:onWebResourceError: '
           'errorCode=${error.errorCode}, '
@@ -232,9 +223,7 @@ class AdaWebViewState extends State<AdaWebView> {
 
   void _onHttpError(HttpResponseError error) => widget.onLoadingError?.call(
         error.request?.uri.toString() ?? '',
-        'uri=${error.response?.uri}, '
-        'statusCode=${error.response?.statusCode}, '
-        'headers=${error.response?.headers}, ',
+        'statusCode=${error.response?.statusCode}',
       );
 
   @visibleForTesting
@@ -382,13 +371,5 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
         widget.onEvent?.call(json);
       },
     );
-  }
-
-  dynamic jsonStrToMap(String message) {
-    if (message.isEmpty) {
-      return <String, dynamic>{};
-    }
-
-    return jsonDecode(message);
   }
 }
