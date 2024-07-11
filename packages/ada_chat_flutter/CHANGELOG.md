@@ -1,3 +1,7 @@
+## 1.1.1
+
+- Refactor. Add more tests.
+
 ## 1.1.0
 
 - Block Ada chat button on selected pages.

@@ -1,6 +1,6 @@
 name: ada_chat_flutter
 description: Flutter implementation of Ada chat
-version: 1.1.0
+version: 1.1.1
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
