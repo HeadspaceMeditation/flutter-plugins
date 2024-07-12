@@ -100,8 +100,9 @@ class AdaWebView extends StatefulWidget {
   final void Function(String request, String response)? onLoadingError;
 
   @override
-  State<AdaWebView> createState() => _AdaWebViewState();
+  State<AdaWebView> createState() => AdaWebViewState();
 
+  // coverage:ignore-start
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
@@ -135,9 +136,11 @@ class AdaWebView extends StatefulWidget {
     properties.add(DoubleProperty('rolloutOverride', rolloutOverride));
     properties.add(DiagnosticsProperty<bool>('testMode', testMode));
   }
+// coverage:ignore-end
 }
 
-class _AdaWebViewState extends State<AdaWebView> {
+@visibleForTesting
+class AdaWebViewState extends State<AdaWebView> {
   late final WebViewController _controller;
 
   @override
@@ -175,10 +178,10 @@ class _AdaWebViewState extends State<AdaWebView> {
           onUrlChange: _onUrlChange,
           onProgress: _onProgress,
           onPageStarted: _onPageStarted,
-          onPageFinished: _onPageFinished,
+          onPageFinished: onPageFinished,
           onHttpError: _onHttpError,
           onWebResourceError: _onWebResourceError,
-          onNavigationRequest: _onNavigationRequest,
+          onNavigationRequest: onNavigationRequest,
         ),
       );
 
@@ -188,12 +191,13 @@ class _AdaWebViewState extends State<AdaWebView> {
   void _onConsoleMessage(JavaScriptConsoleMessage message) =>
       widget.onConsoleMessage?.call(message.level.toString(), message.message);
 
-  FutureOr<NavigationDecision> _onNavigationRequest(NavigationRequest request) {
+  @visibleForTesting
+  FutureOr<NavigationDecision> onNavigationRequest(NavigationRequest request) {
     final uri = Uri.parse(request.url);
     log('AdaWebView:onNavigationRequest: '
         'url=${uri.toString()}, isMainFrame=${request.isMainFrame}');
 
-    if (_isAdaChatLink(uri) || _isAdaSupportLink(uri) || _isBlankPage(uri)) {
+    if (isInternalAdaUrl(uri, widget.embedUri, widget.handle)) {
       return NavigationDecision.navigate;
     }
 
@@ -212,12 +216,6 @@ class _AdaWebViewState extends State<AdaWebView> {
     return NavigationDecision.prevent;
   }
 
-  bool _isBlankPage(Uri uri) => uri.toString() == 'about:blank';
-
-  bool _isAdaSupportLink(Uri uri) => uri.host == '${widget.handle}.ada.support';
-
-  bool _isAdaChatLink(Uri uri) => uri == widget.embedUri;
-
   void _onWebResourceError(WebResourceError error) =>
       log('AdaWebView:onWebResourceError: '
           'errorCode=${error.errorCode}, '
@@ -225,12 +223,11 @@ class _AdaWebViewState extends State<AdaWebView> {
 
   void _onHttpError(HttpResponseError error) => widget.onLoadingError?.call(
         error.request?.uri.toString() ?? '',
-        'uri=${error.response?.uri}, '
-        'statusCode=${error.response?.statusCode}, '
-        'headers=${error.response?.headers}, ',
+        'statusCode=${error.response?.statusCode}',
       );
 
-  void _onPageFinished(String url) {
+  @visibleForTesting
+  void onPageFinished(String url) {
     log('AdaWebView:onPageFinished: url=$url');
 
     Future.delayed(Duration.zero, () async {
@@ -374,13 +371,5 @@ console.log("adaSettings: " + JSON.stringify(window.adaSettings));
         widget.onEvent?.call(json);
       },
     );
-  }
-
-  dynamic jsonStrToMap(String message) {
-    if (message.isEmpty) {
-      return <String, dynamic>{};
-    }
-
-    return jsonDecode(message);
   }
 }

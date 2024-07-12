@@ -16,10 +16,11 @@ class CustomizedWebView extends StatefulWidget {
   final BrowserSettings? browserSettings;
 
   @override
-  State<CustomizedWebView> createState() => _CustomizedWebViewState();
+  State<CustomizedWebView> createState() => CustomizedWebViewState();
 }
 
-class _CustomizedWebViewState extends State<CustomizedWebView> {
+@visibleForTesting
+class CustomizedWebViewState extends State<CustomizedWebView> {
   late final WebViewController _webViewController = WebViewController();
   late final AdaButtonHide _adaButtonHide = AdaButtonHide(
     webViewController: _webViewController,
@@ -37,9 +38,9 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onUrlChange: _onUrlChange,
-          onProgress: _onProgress,
+          onProgress: onProgress,
           onPageStarted: _onPageStarted,
-          onPageFinished: _onPageFinished,
+          onPageFinished: onPageFinished,
           onNavigationRequest: _onNavigationRequest,
         ),
       )
@@ -56,7 +57,8 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
   void _onUrlChange(change) =>
       log('CustomizedWebView:onUrlChange: url=${change.url}');
 
-  Future<void> _onPageFinished(String url) async {
+  @visibleForTesting
+  Future<void> onPageFinished(String url) async {
     log('CustomizedWebView:onPageFinished: url=$url');
 
     final pageController = widget.browserSettings?.control;
@@ -85,7 +87,8 @@ class _CustomizedWebViewState extends State<CustomizedWebView> {
     await _adaButtonHide.maybeHideButton(url);
   }
 
-  void _onProgress(int progress) {
+  @visibleForTesting
+  void onProgress(int progress) {
     log('CustomizedWebView:onProgress: progress=$progress');
 
     final pageController = widget.browserSettings?.control;
