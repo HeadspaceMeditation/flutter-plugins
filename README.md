@@ -1,3 +1,12 @@
+# IMPORTANT NOTE: THIS REPO HAS BEEN DEPRECATED
+
+# PLEASE MIGRATE TO THE [Flutter Monorepo](https://github.com/HeadspaceMeditation/hs-flutter) for all future changes
+
+---
+#
+
+# Original Readme:
+
 # Flutter plugins
 
 [![Build Status](https://api.cirrus-ci.com/github/flutter/plugins.svg)](https://cirrus-ci.com/github/flutter/plugins/master)
